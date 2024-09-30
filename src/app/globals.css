@@ -1,0 +1,74 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Edu+Australia+VIC+WA+NT+Hand:wght@400&display=swap');
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
+.background-style {
+  background: linear-gradient(180deg, rgba(9,9,121,1) 0%, rgba(2,0,36,1) 35%, rgba(0,212,255,1) 100%), url('/path-to-your-background-pattern.png');
+  background-size: cover;
+  background-repeat: no-repeat;
+}
+
+body{
+  @apply font-sans;
+  background-color: rgb(0, 0, 37);
+}
+
+
+         
+.btn-grad {
+  background-image: linear-gradient(to right, #00063b 0%, #3A6073  51%, #16222A  100%);
+
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;            
+  border-radius: 10px;
+  display: block;
+}
+
+.btn-grad:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+
+         
+.joinbtn-grad {
+  background-image: linear-gradient(to right, #25c225 0%, #53346D  51%, #000000  100%);
+  margin: 10px;
+  padding: 15px 45px;
+  text-align: center;
+  text-transform: uppercase;
+  transition: 0.5s;
+  background-size: 200% auto;
+  color: white;
+  border-radius: 10px;
+  display: block;
+}
+
+.joinbtn-grad:hover {
+  background-position: right center; /* change the direction of the change here */
+  color: #fff;
+  text-decoration: none;
+}
+
+@layer utilities {
+  /* Hide scrollbar for Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+      display: none;
+  }
+ /* Hide scrollbar for IE, Edge and Firefox */
+  .no-scrollbar {
+      -ms-overflow-style: none;  /* IE and Edge */
+      scrollbar-width: none;  /* Firefox */
+}
+}
