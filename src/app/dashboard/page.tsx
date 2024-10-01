@@ -67,7 +67,7 @@ const Dashboard = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
   if (isLoading) return <LoadingPage />;
   if (!isAuthenticated) {

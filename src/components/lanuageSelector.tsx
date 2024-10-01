@@ -66,7 +66,7 @@ const Lesson: React.FC = () => {
     };
 
     fetchData();
-  }, [isAuthenticated, setUser]);
+  }, [isAuthenticated, setUser, logout]);
 
   const handleOpenModal = (language: Language) => {
     setSelectedlanguage(language);
@@ -89,7 +89,7 @@ const Lesson: React.FC = () => {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 w-full max-w-6xl">
       {languages.map((language) => (
-        <div className="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow-lg transition duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
+        <div key={language._id} className="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow-lg transition duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
           <FaLanguage className="text-yellow-400 text-4xl mb-4" />
           <h2 className="text-2xl font-bold mb-2">{language.languageName}</h2>
           <p

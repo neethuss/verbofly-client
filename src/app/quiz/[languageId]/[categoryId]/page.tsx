@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { fetchQuizByLanguageAndCategory } from "@/services/quizApi";
 import { fetchUser, updateProgress } from "@/services/userApi";
@@ -24,9 +24,9 @@ const questionTimeout = 30;
 
 const QuizPage = () => {
   const { languageId, categoryId } = useParams();
-  const { user ,logout} = useAuthStore();
+  const { user, logout } = useAuthStore();
   const router = useRouter();
-  const [currenctUser, setCurrenctUser] = useState<User>()
+  const [currenctUser, setCurrenctUser] = useState<User>();
   const [questions, setQuestions] = useState<IQuizQuestion[]>([]);
   const [currentQuestionIndex, setCurrentIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState("");
@@ -40,20 +40,18 @@ const QuizPage = () => {
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
     const fetchCurrentUser = async () => {
-      console.log('useEffect in subscription')
       try {
         const data = await fetchUser(token as string);
-        setCurrenctUser(data)
-        
+        setCurrenctUser(data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              logout()
-            }else if (error.response.status === 401) {
+              logout();
+            } else if (error.response.status === 401) {
               toast.error("Token expired");
-              logout()
+              logout();
             }
           } else {
             toast.error("An unexpected error occurred in login");
@@ -64,7 +62,7 @@ const QuizPage = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
@@ -80,6 +78,43 @@ const QuizPage = () => {
     fetchQuizData();
   }, [languageId, categoryId]);
 
+  const handleNext = useCallback(async () => {
+    if (questions[currentQuestionIndex].correctAnswer === selectedOption) {
+      setScore(score + 1);
+    }
+
+    if (currentQuestionIndex < questions.length - 1) {
+      setSelectedOption("");
+      setCurrentIndex(currentQuestionIndex + 1);
+      setTimeLeft(questionTimeout);
+    } else {
+      const token = localStorage.getItem("userAccessToken");
+      const result = score >= questions.length / 2 ? "passed" : "failed";
+      setQuizResult(result);
+      try {
+        await updateProgress(
+          token as string,
+          userId,
+          languageId as string,
+          undefined,
+          undefined,
+          result as string
+        );
+      } catch (error) {
+        console.error("Error updating quiz progress:", error);
+      }
+
+      setShowScore(true);
+    }
+  }, [
+    currentQuestionIndex,
+    questions,
+    score,
+    selectedOption,
+    userId,
+    languageId,
+  ]);
+
   useEffect(() => {
     if (questions.length > 0 && !showScore) {
       const timer = setInterval(() => {
@@ -94,45 +129,11 @@ const QuizPage = () => {
       }, 1000);
       return () => clearInterval(timer);
     }
-  }, [questions, currentQuestionIndex, showScore]);
+  }, [questions, currentQuestionIndex, showScore, handleNext]);
 
   const handleOptionSelect = (option: string) => {
     setSelectedOption(option);
   };
-
-  const handleNext = async () => {
-    if (questions[currentQuestionIndex].correctAnswer === selectedOption) {
-      setScore(score + 1);
-    }
-
-    if (currentQuestionIndex < questions.length - 1) {
-      setSelectedOption("");
-      setCurrentIndex(currentQuestionIndex + 1);
-      setTimeLeft(questionTimeout);
-    } else {
-      const token = localStorage.getItem("userAccessToken");
-      console.log("object");
-      const result = score >= questions.length / 2 ? "passed" : "failed";
-      console.log(result, "result");
-      setQuizResult(result);
-      try {
-        const data = await updateProgress(
-          token as string,
-          userId,
-          languageId as string,
-          undefined,
-          undefined,
-          result as string
-        );
-        console.log(data);
-      } catch (error) {
-        console.error("Error updating quiz progress:", error);
-      }
-
-      setShowScore(true);
-    }
-  };
-
   if (showScore) {
     return (
       <div className="flex items-center justify-center min-h-screen bg-gray-900">
@@ -145,9 +146,7 @@ const QuizPage = () => {
             <div className="text-7xl font-extrabold text-teal-500 mt-4">
               {score} / {questions.length}
             </div>
-            <div
-              style={{ color: quizResult === "passed" ? "yellow" : "red" }}
-            >
+            <div style={{ color: quizResult === "passed" ? "yellow" : "red" }}>
               {quizResult === "passed"
                 ? "🤩Congratulations! You passed!"
                 : "☹️Sorry, you failed."}

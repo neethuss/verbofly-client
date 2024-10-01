@@ -71,7 +71,7 @@ const Page = () => {
       }
     };
     fetchUsersData();
-  }, [searchCharacters, page, limit]);
+  }, [searchCharacters, page, limit, router]);
 
   const totalPages = Math.ceil(totalUsers / limit);
 

@@ -14,11 +14,12 @@ import { useRouter } from "next/navigation";
 import UserNav from "@/components/UserNav";
 import { fetchLanguages } from "../../services/languageApi";
 import { fetchCountries } from "../../services/countryApi";
-import ProtectedRoute from '@/HOC/ProtectedRoute';
+import ProtectedRoute from "@/HOC/ProtectedRoute";
 import useAuthStore from "@/store/authStore";
 import { FaSearch, FaUsers } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Image from "next/image";
 
 interface Country {
   countryName: string;
@@ -44,11 +45,13 @@ interface User {
 }
 
 const Page = () => {
-  const {logout} = useAuthStore()
+  const { logout } = useAuthStore();
   const [users, setUsers] = useState<User[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
-  const [currentUser, setCurrenctUser] = useState<User>()
-  const [buttonStates, setButtonStates] = useState<Record<string, { text: string; color: string }>>({});
+  const [currentUser, setCurrenctUser] = useState<User>();
+  const [buttonStates, setButtonStates] = useState<
+    Record<string, { text: string; color: string }>
+  >({});
   const [languages, setLanguages] = useState<Language[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [totalUsers, setTotalUsers] = useState<number>(1);
@@ -63,20 +66,19 @@ const Page = () => {
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
     const fetchCurrentUser = async () => {
-      console.log('useEffect in subscription')
+      console.log("useEffect in subscription");
       try {
         const data = await fetchUser(token as string);
-        setCurrenctUser(data)
-        
+        setCurrenctUser(data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              logout()
-            }else if (error.response.status === 401) {
+              logout();
+            } else if (error.response.status === 401) {
               toast.error("Token expired");
-              logout()
+              logout();
             }
           } else {
             toast.error("An unexpected error occurred in login");
@@ -87,24 +89,39 @@ const Page = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
-
+  }, [logout]);
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
     const fetchUsersData = async () => {
       try {
-        const data = await fetchNativeSpeakers(token as string, searchQuery, page, limit, filterCountry, filterLanguage);
+        const data = await fetchNativeSpeakers(
+          token as string,
+          searchQuery,
+          page,
+          limit,
+          filterCountry,
+          filterLanguage
+        );
         const userId = user.user._id;
         setUserId(userId);
         if (data) {
           setUsers(data.users);
           setTotalUsers(data.total);
-          const initialButtonStates: Record<string, { text: string; color: string }> = {};
+          const initialButtonStates: Record<
+            string,
+            { text: string; color: string }
+          > = {};
           data.users.forEach((user: User) => {
-            const isConnected = user.connections.some((connection) => connection === userId);
-            const hasSentRequest = user.sentRequests.some((request) => request === userId);
-            const hasReceivedRequest = user.receivedRequests.some((request) => request === userId);
+            const isConnected = user.connections.some(
+              (connection) => connection === userId
+            );
+            const hasSentRequest = user.sentRequests.some(
+              (request) => request === userId
+            );
+            const hasReceivedRequest = user.receivedRequests.some(
+              (request) => request === userId
+            );
 
             let buttonText = "Connect";
             let buttonColor = "bg-yellow-400 hover:bg-yellow-500 text-black";
@@ -120,7 +137,10 @@ const Page = () => {
               buttonColor = "bg-red-500 hover:bg-red-600 text-white";
             }
 
-            initialButtonStates[user._id] = { text: buttonText, color: buttonColor };
+            initialButtonStates[user._id] = {
+              text: buttonText,
+              color: buttonColor,
+            };
           });
           setButtonStates(initialButtonStates);
         }
@@ -152,7 +172,7 @@ const Page = () => {
     fetchUsersData();
     fetchLanguagesData();
     fetchCountriesData();
-  }, [searchQuery, filterCountry, filterLanguage, page, user.user._id]);
+  }, [searchQuery, filterCountry, filterLanguage, page, user.user._id, limit]);
 
   const totalPages = Math.ceil(totalUsers / limit);
 
@@ -168,7 +188,10 @@ const Page = () => {
         await acceptConnectionRequest(token as string, userId);
         setButtonStates((prev) => ({
           ...prev,
-          [userId]: { text: "Message", color: "bg-yellow-400 hover:bg-yellow-500 text-black" },
+          [userId]: {
+            text: "Message",
+            color: "bg-yellow-400 hover:bg-yellow-500 text-black",
+          },
         }));
         break;
 
@@ -176,7 +199,10 @@ const Page = () => {
         await cancelConnectionRequest(token as string, userId);
         setButtonStates((prev) => ({
           ...prev,
-          [userId]: { text: "Connect", color: "bg-yellow-400 hover:bg-yellow-500 text-black" },
+          [userId]: {
+            text: "Connect",
+            color: "bg-yellow-400 hover:bg-yellow-500 text-black",
+          },
         }));
         break;
 
@@ -184,7 +210,10 @@ const Page = () => {
         await sendConnectionRequest(token as string, userId);
         setButtonStates((prev) => ({
           ...prev,
-          [userId]: { text: "Cancel request", color: "bg-red-500 hover:bg-red-600 text-white" },
+          [userId]: {
+            text: "Cancel request",
+            color: "bg-red-500 hover:bg-red-600 text-white",
+          },
         }));
         break;
 
@@ -202,8 +231,10 @@ const Page = () => {
       </Head>
       <UserNav />
       <main className="flex-1 p-8">
-        <h1 className="text-4xl font-bold mb-8 text-center">Find Native Speakers</h1>
-        
+        <h1 className="text-4xl font-bold mb-8 text-center">
+          Find Native Speakers
+        </h1>
+
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <div className="col-span-3 md:col-span-1">
@@ -259,25 +290,42 @@ const Page = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
             {users.map((user) => {
-              const { text: buttonText, color: buttonColor } = buttonStates[user._id] || 
-                { text: "Connect", color: "bg-yellow-400 hover:bg-yellow-500 text-black" };
+              const { text: buttonText, color: buttonColor } = buttonStates[
+                user._id
+              ] || {
+                text: "Connect",
+                color: "bg-yellow-400 hover:bg-yellow-500 text-black",
+              };
 
               return (
-                <div key={user._id} className="bg-[#1e293b] rounded-lg overflow-hidden shadow-lg">
+                <div
+                  key={user._id}
+                  className="bg-[#1e293b] rounded-lg overflow-hidden shadow-lg"
+                >
                   <div className="h-48 overflow-hidden">
-                    <img
+                    <Image
                       src={user.profilePhoto || BlankProfile.src}
                       alt={`${user.username}'s profile`}
                       className="w-full h-full object-cover"
+                      width={500}
+                      height={500}
+                      objectFit="cover"
                     />
                   </div>
                   <div className="p-6">
-                    <h2 className="text-xl font-semibold mb-2">{user.username.charAt(0).toUpperCase()+user.username.slice(1)}</h2>
+                    <h2 className="text-xl font-semibold mb-2">
+                      {user.username.charAt(0).toUpperCase() +
+                        user.username.slice(1)}
+                    </h2>
                     {user?.country?.countryName && (
-                      <p className="text-gray-300 mb-1">Country: {user.country.countryName}</p>
+                      <p className="text-gray-300 mb-1">
+                        Country: {user.country.countryName}
+                      </p>
                     )}
                     {user?.nativeLanguage?.languageName && (
-                      <p className="text-gray-300 mb-4">Native Language: {user.nativeLanguage.languageName}</p>
+                      <p className="text-gray-300 mb-4">
+                        Native Language: {user.nativeLanguage.languageName}
+                      </p>
                     )}
                     <div className="flex justify-between items-center">
                       <button
@@ -298,7 +346,7 @@ const Page = () => {
               );
             })}
           </div>
-          
+
           <div className="flex justify-center">
             <div className="flex items-center space-x-4">
               <button

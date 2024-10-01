@@ -27,7 +27,7 @@ interface Language {
   countries: Country[];
 }
 
-const Page = () => {
+const EditLanguagePage = () => {
   const {token, adminLogout} = useAdminAuthStore()
   const [language, setLanguage] = useState<Language | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
@@ -80,7 +80,7 @@ const Page = () => {
     };
 
     fetchLanguage();
-  }, [editLanguage]);
+  }, [editLanguage, token]);
 
   const handleGoBack = () => {
     router.back();
@@ -248,4 +248,4 @@ const Page = () => {
   );
 };
 
-export default AdminProtedctedRoute(Page);
+export default AdminProtedctedRoute(EditLanguagePage);

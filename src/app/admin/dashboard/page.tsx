@@ -36,7 +36,7 @@ interface User {
   createdAt: Date
 }
 
-const page = () => {
+const AdminDashboard = () => {
   const {token} = useAdminAuthStore()
   const [totalUsers, setTotalUsers] = useState(0);
   const [newUsers, setNewUsers] = useState(0);
@@ -74,7 +74,7 @@ const page = () => {
       }
     };
     fetchUsersData();
-  }, []);
+  }, [token]);
 
   const groupUsersByNativeLanguage = (
     users: User[]
@@ -163,4 +163,4 @@ const page = () => {
   );
 };
 
-export default AdminProtectedRoute(page);
+export default AdminProtectedRoute(AdminDashboard);

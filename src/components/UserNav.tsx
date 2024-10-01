@@ -11,13 +11,12 @@ import { CiSquareQuestion } from "react-icons/ci";
 import { MdPayment } from "react-icons/md";
 import useAuthStore from "@/store/authStore";
 import Modal from "./Modal";
-import { userAgent } from "next/server";
 
-const UserNav: React.FC = React.memo(() => {
+const UserNav: React.FC = React.memo(function UserNav() { // Named function
   const [showModal, setShowModal] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const router = useRouter();
-  const { logout, isAuthenticated, user } = useAuthStore();
+  const { logout, isAuthenticated } = useAuthStore();
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -32,19 +31,21 @@ const UserNav: React.FC = React.memo(() => {
     href: string;
     icon: React.ReactNode;
     label: string;
-  }> = ({ href, icon, label }) => (
-    <Link href={href} className="group relative flex flex-col items-center">
-      <div className="p-2 rounded-full bg-gray-800 hover:bg-yellow-400 transition duration-300">
-        {React.cloneElement(icon as React.ReactElement, {
-          className: "text-yellow-400 group-hover:text-black",
-          size: 20,
-        })}
-      </div>
-      <span className="mt-1 text-xs text-white opacity-0 group-hover:opacity-100 transition duration-300">
-        {label}
-      </span>
-    </Link>
-  );
+  }> = function NavItem({ href, icon, label }) { 
+    return (
+      <Link href={href} className="group relative flex flex-col items-center">
+        <div className="p-2 rounded-full bg-gray-800 hover:bg-yellow-400 transition duration-300">
+          {React.cloneElement(icon as React.ReactElement, {
+            className: "text-yellow-400 group-hover:text-black",
+            size: 20,
+          })}
+        </div>
+        <span className="mt-1 text-xs text-white opacity-0 group-hover:opacity-100 transition duration-300">
+          {label}
+        </span>
+      </Link>
+    );
+  };
 
   return (
     <>

@@ -8,7 +8,7 @@ import { postLogin } from "../../services/adminApi";
 import { loginSchema } from "@/utils/Validation";
 import useAdminAuthStore from "@/store/adminAuthStore";
 
-const page = () => {
+const AdminLogin = () => {
   const { isAdminAuthenticated, setAdminAuth } = useAdminAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -132,4 +132,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default AdminLogin;

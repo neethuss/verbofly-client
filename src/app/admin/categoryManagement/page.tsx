@@ -19,7 +19,7 @@ interface Category {
   isBlocked: boolean;
 }
 
-const page = () => {
+const CategoryManagementPage = () => {
   const {token} = useAdminAuthStore()
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
@@ -62,7 +62,7 @@ const page = () => {
       }
     };
     fetchCategoriesData();
-  }, [searchCharacters, page, limit]);
+  }, [searchCharacters, page, limit, router, token]);
 
   const handleBlockUnblock = async (
     id: string,
@@ -248,4 +248,4 @@ const page = () => {
   );
 };
 
-export default AdminProtedctedRoute(page);
+export default AdminProtedctedRoute(CategoryManagementPage);

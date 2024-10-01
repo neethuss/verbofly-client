@@ -78,7 +78,7 @@ const AddLessonPage = () => {
 
     fetchLanguagesData();
     fetchCategoriesData();
-  }, []);
+  }, [token]);
 
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;

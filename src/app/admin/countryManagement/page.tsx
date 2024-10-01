@@ -19,7 +19,7 @@ interface Country {
   isBlocked: boolean;
 }
 
-const page = () => {
+const CountryManagementPage = () => {
   const {token, adminLogout} = useAdminAuthStore()
   const [countries, setCountries] = useState<Country[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
@@ -60,7 +60,7 @@ const page = () => {
       }
     };
     fetchCountriesData();
-  }, [searchCharacters, page, limit]);
+  }, [searchCharacters, page, limit, adminLogout, token]);
 
   const handleBlockUnblock = async (
     id: string,
@@ -247,4 +247,4 @@ const page = () => {
   );
 };
 
-export default AdminProtedctedRoute(page);
+export default AdminProtedctedRoute(CountryManagementPage);

@@ -70,7 +70,7 @@ export default function TranslatePage() {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
 
 

@@ -13,7 +13,7 @@ import useAdminAuthStore from '@/store/adminAuthStore'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const page = () => {
+const EditCountryPage = () => {
 const {token, adminLogout} = useAdminAuthStore()
   const [countryName, setCountryName] = useState<string>('')
   const [errors, setErrors] = useState<CountryErrors>({});
@@ -39,7 +39,7 @@ const {token, adminLogout} = useAdminAuthStore()
       }
     }
     fetchCountry()
-  },[editCountry])
+  },[editCountry, token])
 
   const handleGoBack = () => {
     router.back()
@@ -149,4 +149,4 @@ const {token, adminLogout} = useAdminAuthStore()
   )
 }
 
-export default AdminProtedctedRoute(page)
+export default AdminProtedctedRoute(EditCountryPage)

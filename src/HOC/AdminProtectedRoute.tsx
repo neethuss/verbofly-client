@@ -14,7 +14,7 @@ const protectedRoute = (WrappedComponent: React.ComponentType) => {
         await initAdminAuth();
       };
       checkAuth();
-    }, []);
+    }, [initAdminAuth]);
 
     useEffect(() => {
       const tokenCheckInterval = setInterval(() => {

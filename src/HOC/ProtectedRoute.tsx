@@ -14,7 +14,7 @@ const protectedRoute = (WrappedComponent: React.ComponentType) => {
         const token = localStorage.getItem("userAccessToken");
       };
       checkAuth();
-    }, [])
+    }, [initAuth])
 
     useEffect(() => {
       const tokenCheckInterval = setInterval(()=>{

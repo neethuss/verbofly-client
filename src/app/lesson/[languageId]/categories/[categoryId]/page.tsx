@@ -67,7 +67,7 @@ const LessonListPage = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
 
   useEffect(() => {
@@ -84,7 +84,21 @@ const LessonListPage = () => {
           setCategoryName(data[0].categoryName.categoryName);
         }
       } catch (error) {
-        handleError(error);
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
       }
     };
 
@@ -108,27 +122,28 @@ const LessonListPage = () => {
         );
         setIsCompleted(progressMap);
       } catch (error) {
-        handleError(error);
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
       }
     };
 
     fetchData();
     fetchUserProgressData();
-  }, [languageId, categoryId, router]);
+  }, [languageId, categoryId, router, logout]);
 
-  const handleError = (error: unknown) => {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      console.error("Token expired or unauthorized. Redirecting to login...");
-      localStorage.removeItem("userAccessToken");
-      localStorage.removeItem("user");
-      toast.error("Token expired...Login again!");
-      router.push("/login");
-    } else if (axios.isAxiosError(error) && error.response?.status === 404) {
-      console.log("Progress is not yet created");
-    } else {
-      console.error("Error fetching data:", error);
-    }
-  };
 
   const openVideoLesson = (lessonId: string) => {
     router.push(`/lesson/${languageId}/categories/${categoryId}/${lessonId}`);

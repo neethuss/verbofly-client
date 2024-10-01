@@ -4,10 +4,9 @@ import React from 'react'
 import { useState, FormEvent, ChangeEvent } from 'react';
 import { useRouter } from 'next/navigation';
 import { toast, ToastContainer } from "react-toastify";
-import axios from 'axios';
 import { sendForgotPasswordEmail } from '@/services/userApi';
 
-const page = () => {
+const ForgotPasswordPage = () => {
   const [email, setEmail] = useState('');
 
   const router = useRouter()
@@ -79,4 +78,4 @@ const page = () => {
   );
 }
 
-export default page
+export default ForgotPasswordPage

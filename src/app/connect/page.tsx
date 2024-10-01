@@ -69,7 +69,7 @@ const ConnectionsPage = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
 
   if (isLoading) {

@@ -55,7 +55,7 @@ const VideoLessonPage = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
 
   useEffect(() => {

@@ -12,7 +12,7 @@ import useAdminAuthStore from "@/store/adminAuthStore";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const page = () => {
+const AddCategoryPage = () => {
   const {token} = useAdminAuthStore()
   const [categoryName, setCategoryName] = useState<string>("");
   const [errors, setErrors] = useState<CategoryErrors>({});
@@ -126,4 +126,4 @@ const page = () => {
   );
 };
 
-export default AdminProtedctedRoute(page);
+export default AdminProtedctedRoute(AddCategoryPage);

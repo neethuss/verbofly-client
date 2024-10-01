@@ -100,7 +100,7 @@ const ProgressPage: React.FC = () => {
     };
 
     fetchData();
-  }, [router, setUser]);
+  }, [router, setUser, logout]);
 
   const handleLanguageChange = useCallback(
     async (languageId: string) => {

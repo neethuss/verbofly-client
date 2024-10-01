@@ -71,7 +71,7 @@ const UserProfile: React.FC = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
 
 

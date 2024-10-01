@@ -46,7 +46,7 @@ const GroupChatPage: React.FC = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
 
   useEffect(() => {
@@ -86,7 +86,7 @@ const GroupChatPage: React.FC = () => {
         zp.destroy();
       }
     };
-  }, [roomId, user]);
+  }, [roomId, user, zp]);
 
   const handleLeaveRoom = () => {
     if (zp) {

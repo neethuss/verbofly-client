@@ -10,6 +10,7 @@ import Select from "react-select";
 import { LanguageErrors } from "@/utils/Types";
 import { languageSchema } from "@/utils/Validation";
 import useAdminAuthStore from "@/store/adminAuthStore";
+import { fetchCountries } from "@/services/countryApi";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -19,7 +20,7 @@ interface Country {
   isBlocked :boolean
 }
 
-const page = () => {
+const AddLanguagePage = () => {
   const {token, adminLogout} = useAdminAuthStore()
   const [languageName, setLanguageName] = useState<string>("");
   const [countries, setCountries] = useState<Country[]>([]);
@@ -27,25 +28,26 @@ const page = () => {
   const [errors, setErrors] = useState<LanguageErrors>({});
 
   useEffect(() => {
+    const fetchCountries = async () => {
+      try {
+        const response = await axios.get(
+          `${BACKEND_URL}/country/countries`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const notBlockedCountries = response.data.countries.filter((country:Country)=>!country.isBlocked)
+        setCountries(notBlockedCountries);
+      } catch (error) {
+        console.log("Error fetching countries", error);
+      }
+    };
     fetchCountries();
-  }, []);
+  }, [token]);
 
-  const fetchCountries = async () => {
-    try {
-      const response = await axios.get(
-        `${BACKEND_URL}/country/countries`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      const notBlockedCountries = response.data.countries.filter((country:Country)=>!country.isBlocked)
-      setCountries(notBlockedCountries);
-    } catch (error) {
-      console.log("Error fetching countries", error);
-    }
-  };
+  
 
   const router = useRouter();
 
@@ -189,4 +191,4 @@ const page = () => {
   );
 };
 
-export default AdminProtedctedRoute(page);
+export default AdminProtedctedRoute(AddLanguagePage);

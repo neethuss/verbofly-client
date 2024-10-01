@@ -39,7 +39,7 @@ interface IQuiz {
   questions: IQuizQuestion[];
 }
 
-const page = () => {
+const QuizManagementPage = () => {
   const {token, adminLogout} = useAdminAuthStore()
   const [quizzes, setQuizzes] = useState<IQuiz[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
@@ -74,7 +74,7 @@ const page = () => {
       }
     };
     fetchQuizzesdata();
-  }, [searchCharacters, page, limit]);
+  }, [searchCharacters, page, limit, adminLogout, token]);
 
   const handleAddQuiz = () => {
     router.push("/admin/quizManagement/addQuiz");
@@ -230,4 +230,4 @@ const page = () => {
   );
 };
 
-export default AdminProtedctedRoute(page);
+export default AdminProtedctedRoute(QuizManagementPage);

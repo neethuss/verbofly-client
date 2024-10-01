@@ -11,7 +11,7 @@ import { countrySchema } from "@/utils/Validation";
 import useAdminAuthStore from "@/store/adminAuthStore";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const page = () => {
+const AddCountryPage = () => {
   const {token, adminLogout} = useAdminAuthStore()
   const [countryName, setCountryName] = useState<string>("");
   const [errors, setErrors] = useState<CountryErrors>({});
@@ -124,4 +124,4 @@ const page = () => {
   );
 };
 
-export default AdminProtedctedRoute(page);
+export default AdminProtedctedRoute(AddCountryPage);

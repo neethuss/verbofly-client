@@ -56,7 +56,7 @@ function Subscription() {
       }
     };
     fetchCurrentUser();
-  }, [subscribed]);
+  }, [subscribed, logout]);
 
   const createOrderId = async () => {
     try {

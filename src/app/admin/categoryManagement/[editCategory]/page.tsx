@@ -13,7 +13,7 @@ import useAdminAuthStore from '@/store/adminAuthStore'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
-const page = () => {
+const EditCategoryPage = () => {
 const {token, adminLogout} = useAdminAuthStore()
   const [categoryName, setCategoryName] = useState<string>('')
   const [errors, setErrors] = useState<CategoryErrors>({});
@@ -47,7 +47,7 @@ const {token, adminLogout} = useAdminAuthStore()
       }
     }
     fetchCategory()
-  },[editCategory])
+  },[editCategory, adminLogout, token])
 
   const handleGoBack = () => {
     router.back()
@@ -158,4 +158,4 @@ const {token, adminLogout} = useAdminAuthStore()
   )
 }
 
-export default AdminProtedctedRoute(page)
+export default AdminProtedctedRoute(EditCategoryPage)

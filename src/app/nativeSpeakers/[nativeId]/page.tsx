@@ -19,6 +19,7 @@ import { GiProgression } from "react-icons/gi";
 import { CiSquareQuestion } from "react-icons/ci";
 import axios from "axios";
 import { toast } from "react-toastify";
+import Image from "next/image";
 
 interface Country {
   countryName: string;
@@ -45,43 +46,42 @@ interface User {
 }
 
 const Page = () => {
-  const [user, setUser] = useState<User>()
+  const [user, setUser] = useState<User>();
   const [currentUser, setCurrentUser] = useState<User>();
   const [buttonText, setButtonText] = useState<string>("Connect");
   const [buttonColor, setButtonColor] = useState<string>(
     "bg-yellow-400 hover:bg-yellow-500 text-black"
   );
-  const [showModal, setShowModal] = useState<boolean>(false)
+  const [showModal, setShowModal] = useState<boolean>(false);
 
   const { logout } = useAuthStore();
   const { nativeId } = useParams();
   const router = useRouter();
 
-  const handleOpenModal = ()=> {
-    setShowModal(true)
-  }
+  const handleOpenModal = () => {
+    setShowModal(true);
+  };
 
-  const handleCloseModal = ()=> {
-    setShowModal(false)
-  }
+  const handleCloseModal = () => {
+    setShowModal(false);
+  };
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
     const fetchCurrentUser = async () => {
-      console.log('useEffect in subscription')
+      console.log("useEffect in subscription");
       try {
         const data = await fetchUser(token as string);
-        setUser(data)
-        
+        setUser(data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              logout()
-            }else if (error.response.status === 401) {
+              logout();
+            } else if (error.response.status === 401) {
               toast.error("Token expired");
-              logout()
+              logout();
             }
           } else {
             toast.error("An unexpected error occurred in login");
@@ -92,9 +92,7 @@ const Page = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
-
-
+  }, [logout]);
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
@@ -106,13 +104,13 @@ const Page = () => {
         setCurrentUser(data.nativeUser);
         console.log(userId, "userise");
         const isConnected = data.nativeUser.connections.some(
-          (connection : User) => connection._id  === userId
+          (connection: User) => connection._id === userId
         );
         const hasSentRequest = data.nativeUser.sentRequests.some(
-          (request:User) => request._id === userId
+          (request: User) => request._id === userId
         );
         const hasReceivedRequest = data.nativeUser.receivedRequests.some(
-          (request:User) => request._id === userId
+          (request: User) => request._id === userId
         );
 
         let buttonText = "Connect";
@@ -142,7 +140,7 @@ const Page = () => {
 
     fetchUserData();
     fetchUserrData();
-  }, [nativeId, setUser]);
+  }, [nativeId, setUser, user?._id]);
 
   const handleClick = async (buttonText: string, userId: string) => {
     const token = localStorage.getItem("userAccessToken");
@@ -184,10 +182,13 @@ const Page = () => {
         <h1 className="text-4xl font-bold mb-8">User Profile</h1>
         <div className="bg-gray-800 rounded-lg p-8 w-full max-w-4xl shadow-lg">
           <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
-            <img
+            <Image
               src={currentUser?.profilePhoto || BlankProfile.src}
               alt="User Profile"
-              className="w-32 h-32 rounded-full object-cover border-4 border-yellow-400"
+              className="rounded-full border-4 border-yellow-400"
+              width={128}
+              height={128}
+              objectFit="cover"
             />
             <div className="flex-grow text-center md:text-left">
               <h2 className="text-3xl font-bold text-yellow-400">
@@ -235,7 +236,10 @@ const Page = () => {
               <p>
                 <strong>Country:</strong> {currentUser?.country?.countryName}
               </p>
-              <p onClick={handleOpenModal} className="hover:text-yellow-400 hover:underline cursor-pointer">
+              <p
+                onClick={handleOpenModal}
+                className="hover:text-yellow-400 hover:underline cursor-pointer"
+              >
                 <strong>Connections:</strong> {currentUser?.connections.length}
               </p>
               <p>
@@ -245,7 +249,6 @@ const Page = () => {
           </div>
         </div>
       </main>
-      
     </div>
   );
 };

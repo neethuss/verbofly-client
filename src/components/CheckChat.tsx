@@ -50,6 +50,15 @@ const CheckChat: React.FC<CheckChatProps> = ({
     if (socket) {
       console.log("socket is presnet", socket);
     }
+  }, [initializeSocket, socket]);
+
+  const scrollToBottom = useCallback(() => {
+    if (chatContainerRef.current) {
+      const scrollHeight = chatContainerRef.current.scrollHeight;
+      const height = chatContainerRef.current.clientHeight;
+      const maxScrollTop = scrollHeight - height;
+      chatContainerRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
+    }
   }, []);
 
   useEffect(() => {
@@ -79,13 +88,13 @@ const CheckChat: React.FC<CheckChatProps> = ({
     };
 
     fetchChat();
-  }, [currentUserId, otherUserId]);
+  }, [currentUserId, otherUserId, messages, onMessagesRead, scrollToBottom]);
 
   useEffect(() => {
     if (!socket) {
       initializeSocket();
     }
-  }, []);
+  }, [initializeSocket, socket]);
 
   useEffect(() => {
     if (socket) {
@@ -112,7 +121,7 @@ const CheckChat: React.FC<CheckChatProps> = ({
         socket.off("chat message", handleChatMessage);
       };
     }
-  }, [socket]);
+  }, [socket, onNewMessage, otherUserDetails?.username, otherUserId]);
 
   const sendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -227,15 +236,6 @@ const CheckChat: React.FC<CheckChatProps> = ({
     setFullScreenImage(null);
   };
 
-  const scrollToBottom = useCallback(() => {
-    if (chatContainerRef.current) {
-      const scrollHeight = chatContainerRef.current.scrollHeight;
-      const height = chatContainerRef.current.clientHeight;
-      const maxScrollTop = scrollHeight - height;
-      chatContainerRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
-    }
-  }, []);
-
   useEffect(() => {
     scrollToBottom();
   }, [messages, scrollToBottom]);
@@ -308,11 +308,15 @@ const CheckChat: React.FC<CheckChatProps> = ({
     <div className="flex flex-col h-full relativ">
       <div className="bg-gray-900 flex justify-between text-white border-transparent rounded-2xl px-2">
         <div className="flex">
-          <img
+          <Image
             className="w-10 h-10 rounded-full mr-3"
             src={otherUserDetails?.profilePhoto || "/default-profile.jpg"}
             alt={otherUserDetails?.username}
+            width={40}
+            height={40}
+            priority={true}
           />
+
           <p>{otherUserDetails?.username}</p>
         </div>
         <div className="items-center py-2">
@@ -355,14 +359,15 @@ const CheckChat: React.FC<CheckChatProps> = ({
                 )}
 
                 {message.image && (
-                  <img
-                    src={message.image}
-                    alt="Message"
-                    className="mt-2 max-w-xs h-20 w-auto object-fill cursor-pointer"
-                    onClick={() =>
-                      handleShowFullScreen(message.image as string)
-                    }
-                  />
+                  <Image
+                  src={message.image}
+                  alt="Message"
+                  className="mt-2 max-w-xs h-20 w-auto cursor-pointer"
+                  width={80} 
+                  height={80}
+                  onClick={() => handleShowFullScreen(message.image as string)}
+                  style={{ objectFit: 'fill' }} 
+                />
                 )}
 
                 {message.call && (
@@ -446,7 +451,7 @@ const CheckChat: React.FC<CheckChatProps> = ({
 
           {imagePreview && (
             <div className="relative">
-              <img
+              <Image
                 src={imagePreview}
                 alt="Preview"
                 className="max-w-xs max-h-32 object-cover"
@@ -511,7 +516,7 @@ const CheckChat: React.FC<CheckChatProps> = ({
       {fullScreenImage && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-90 z-50 p-4">
           <div className="relative w-full h-full flex items-center justify-center">
-            <img
+            <Image
               src={fullScreenImage}
               alt="Full screen image"
               className="max-h-[calc(100vh-2rem)] max-w-[calc(100vw-2rem)] object-contain"

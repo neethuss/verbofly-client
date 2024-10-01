@@ -154,7 +154,7 @@ const EditProfile: React.FC = () => {
     fetchUser();
     fetchCountriesData();
     fetchLanguagesData();
-  }, [router]);
+  }, [router, logout]);
 
   const handleSave = async () => {
     const token = localStorage.getItem('userAccessToken');

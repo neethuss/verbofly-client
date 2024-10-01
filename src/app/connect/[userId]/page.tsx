@@ -15,6 +15,7 @@ import CheckChat from "@/components/CheckChat";
 import ProtectedRoute from "@/HOC/ProtectedRoute";
 import CallNotification from "@/components/CallNofication";
 import Videocall from "@/components/VideoCall";
+import Image from "next/image";
 
 interface LastMessage {
   _id: string;
@@ -23,7 +24,7 @@ interface LastMessage {
   senderId: string;
   senderName: string | undefined;
   image: string;
-  audio:string
+  audio: string;
 }
 
 export interface User {
@@ -63,7 +64,7 @@ interface Chat {
   unreadMessages: number;
 }
 
-const page = () => {
+const ChatPage = () => {
   const { user, logout } = useAuthStore();
   const { userId } = useParams();
 
@@ -176,7 +177,7 @@ const page = () => {
     };
 
     fetchUserChats();
-  }, [currentUserId, userId]);
+  }, [currentUserId, userId, logout, router]);
 
   useEffect(() => {
     if (!socket) {
@@ -187,7 +188,7 @@ const page = () => {
     return () => {
       socket?.disconnect();
     };
-  }, [socket]);
+  }, [socket, initializeSocket]);
 
   const handleUserClick = (userId: string) => {
     const clickedUser = chatUsers.find(
@@ -283,14 +284,17 @@ const page = () => {
                     }`}
                     onClick={() => handleUserClick(chatUser.otherUser._id)}
                   >
-                    
-                    <img
+                    <Image
                       className="w-10 h-10 rounded-full mr-3"
                       src={
                         chatUser.otherUser.profilePhoto ||
                         "/default-profile.jpg"
                       }
                       alt={chatUser.otherUser.username}
+                      width={40}
+                      height={40}
+                      objectFit="cover"
+                      placeholder="blur"
                     />
                     <div className="flex-1">
                       <div className="font-semibold">
@@ -304,7 +308,7 @@ const page = () => {
                             : chatUser.lastMessage.senderName}
                           : <span>📷 Photo</span>
                         </div>
-                      ) : chatUser.lastMessage.audio ? ( 
+                      ) : chatUser.lastMessage.audio ? (
                         <div className="text-sm opacity-75">
                           {chatUser.lastMessage.senderId === currentUserId
                             ? "Me"
@@ -366,7 +370,9 @@ const page = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-1/3">
             <form onSubmit={handleCreateGroup}>
-              <h2 className="text-2xl font-bold mb-4">Enter a conference meeting</h2>
+              <h2 className="text-2xl font-bold mb-4">
+                Enter a conference meeting
+              </h2>
               <input
                 type="text"
                 value={roomId}
@@ -396,4 +402,4 @@ const page = () => {
   );
 };
 
-export default ProtectedRoute(page);
+export default ProtectedRoute(ChatPage);

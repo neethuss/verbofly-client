@@ -42,7 +42,7 @@ interface Lesson {
   isBlocked: boolean;
 }
 
-const Page = () => {
+const EditLessonPage = () => {
   const {token, adminLogout} = useAdminAuthStore()
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
@@ -97,7 +97,7 @@ const Page = () => {
     };
 
     fetchLessonData();
-  }, [editLesson]);
+  }, [editLesson, token]);
 
   const handleEdit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -319,4 +319,4 @@ const Page = () => {
   );
 };
 
-export default AdminProtedctedRoute(Page);
+export default AdminProtedctedRoute(EditLessonPage);

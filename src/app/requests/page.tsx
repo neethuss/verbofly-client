@@ -113,7 +113,7 @@ const IncomingRequestsPage = () => {
 
 
     fetchData();
-  }, [router, setUser]);
+  }, [router, setUser, logout]);
 
 
 

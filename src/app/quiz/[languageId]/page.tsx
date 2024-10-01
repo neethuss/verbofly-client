@@ -24,7 +24,7 @@ interface ILanguage {
   languageName: string;
 }
 
-const page = () => {
+const QuizLanguagePage = () => {
   const { languageId } = useParams();
   const [currentUser, setCurrentUser] = useState<User>()
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -62,7 +62,7 @@ const page = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
@@ -82,7 +82,7 @@ const page = () => {
     fetchCategoriesData();
     console.log(user,'user')
     setSubscribed(user.user.isSubscribed);
-  },[languageId, router, user.user.isSubscribed]);
+  },[languageId, router, user.user.isSubscribed, user]);
 
   const handleCategoryClick = (categoryId: string, categoryName: string) => {
     if (categoryName.toLowerCase() === 'beginner' || subscribed) {
@@ -179,4 +179,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default QuizLanguagePage;

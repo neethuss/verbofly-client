@@ -8,7 +8,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { resetPassword } from '@/services/userApi';
 import { resetPasswordSchema } from '@/utils/Validation';
 
-const page = () => {
+const ResetPasswordPage = () => {
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState<ResetErrors>({});
@@ -122,4 +122,4 @@ const page = () => {
   );
 }
 
-export default page
+export default ResetPasswordPage

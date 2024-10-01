@@ -59,7 +59,7 @@ const Quiz: React.FC = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
   
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");

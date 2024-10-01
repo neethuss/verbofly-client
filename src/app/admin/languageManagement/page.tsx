@@ -25,7 +25,7 @@ interface Language {
   isBlocked: boolean;
 }
 
-const page = () => {
+const LanguageManagementPage = () => {
   const {token, adminLogout} = useAdminAuthStore()
   const [languages, setLanguages] = useState<Language[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
@@ -66,7 +66,7 @@ const page = () => {
       }
     };
     fetchLanguagesData();
-  }, [searchCharacters, page, limit]);
+  }, [searchCharacters, page, limit, adminLogout, token]);
 
   const handleBlockUnblock = async (
     id: string,
@@ -268,4 +268,4 @@ const page = () => {
   );
 };
 
-export default AdminProtedctedRoute(page);
+export default AdminProtedctedRoute(LanguageManagementPage);

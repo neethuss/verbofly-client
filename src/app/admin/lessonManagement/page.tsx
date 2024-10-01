@@ -33,7 +33,7 @@ interface Lesson {
   isBlocked: boolean;
 }
 
-const page = () => {
+const LessonManagementPage = () => {
   const {token, adminLogout} = useAdminAuthStore()
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
@@ -74,7 +74,7 @@ const page = () => {
       }
     };
     fetchLessonsData();
-  }, [searchCharacters, page, limit]);
+  }, [searchCharacters, page, limit, adminLogout, token]);
 
   const handleBlockUnblock = async (
     id: string,
@@ -272,4 +272,4 @@ const page = () => {
   );
 };
 
-export default AdminProtedctedRoute(page);
+export default AdminProtedctedRoute(LessonManagementPage);

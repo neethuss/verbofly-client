@@ -45,7 +45,7 @@ const {logout} = useAuthStore()
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
 
   return (

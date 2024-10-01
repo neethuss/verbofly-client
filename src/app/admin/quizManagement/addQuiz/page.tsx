@@ -31,7 +31,7 @@ interface IQuizQuestion {
   correctAnswer: string;
 }
 
-const Page = () => {
+const AddQuizPage = () => {
   const {token, adminLogout} = useAdminAuthStore()
   const [name, setName] = useState<string>("");
   const [languages, setLanguages] = useState<ILanguage[]>([]);
@@ -60,7 +60,7 @@ const Page = () => {
 
     fetchLanguagesData();
     fetchCategoriesData();
-  }, []);
+  }, [token]);
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => {
@@ -307,4 +307,4 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default AddQuizPage;

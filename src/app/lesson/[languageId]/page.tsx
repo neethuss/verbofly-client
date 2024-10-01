@@ -53,7 +53,7 @@ const LessonPage = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
 
   useEffect(() => {
@@ -70,23 +70,11 @@ const LessonPage = () => {
             logout()
           }
         }
-        handleError(error);
       }
     };
     fetchLanguage();
-  }, [languageId]);
+  }, [languageId, logout]);
 
-  const handleError = (error: unknown) => {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
-      localStorage.removeItem("userAccessToken");
-      localStorage.removeItem("user");
-      toast.error("Session expired. Please log in again.");
-      router.push("/login");
-    } else {
-      console.error("An error occurred:", error);
-      toast.error("An error occurred. Please try again later.");
-    }
-  };
 
   return (
     <div className="flex min-h-screen bg-gray-900 text-white font-sans">
@@ -111,7 +99,7 @@ const LessonPage = () => {
               Begin your language learning journey with interactive lessons and exercises.
             </p>
             <button className="mt-auto bg-yellow-400 hover:bg-yellow-500 text-black py-2 px-4 rounded-full">
-              Let's Go!
+              Let&apos;s Go!
             </button>
           </div>
         </div>

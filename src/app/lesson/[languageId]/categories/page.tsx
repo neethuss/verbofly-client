@@ -60,7 +60,7 @@ const CategoryPage = () => {
       }
     };
     fetchCurrentUser();
-  }, []);
+  }, [logout]);
 
 
   useEffect(() => {
