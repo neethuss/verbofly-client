@@ -3,10 +3,10 @@
 import React from 'react'
 import { useState, FormEvent } from 'react';
 import { useRouter } from 'next/navigation';
-import { ResetErrors } from '@/lib/utils/Types';
+import { ResetErrors } from '@/utils/Types';
 import { toast, ToastContainer } from "react-toastify";
 import { resetPassword } from '@/services/userApi';
-import { resetPasswordSchema } from '@/lib/utils/Validation';
+import { resetPasswordSchema } from '@/utils/Validation';
 
 const page = () => {
   const [password, setPassword] = useState('');
