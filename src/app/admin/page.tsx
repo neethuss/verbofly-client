@@ -9,7 +9,7 @@ import { loginSchema } from "@/utils/Validation";
 import useAdminAuthStore from "@/store/adminAuthStore";
 
 const page = () => {
-  const { isAdminAuthenticated } = useAdminAuthStore();
+  const { isAdminAuthenticated, setAdminAuth } = useAdminAuthStore();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<SignupErrors>({});
@@ -54,14 +54,8 @@ const page = () => {
     console.log(email, password, "cred");
     const data = await postLogin(email, password);
     if (data) {
-      console.log("Login successful", data);
       toast.success("Login successful!");
-      const expiresAt = new Date().getTime() + 7 * 24 * 60 * 60 * 1000;
-      localStorage.setItem("adminAccessToken", data.accessToken);
-      console.log(expiresAt, "adminex");
-      console.log(localStorage.getItem("adminAccessToken"), "admin");
-      localStorage.setItem("admin", JSON.stringify(data.isAdmin));
-      localStorage.setItem("adminExpiresAt", expiresAt.toString());
+      setAdminAuth(data.isAdmin, data.accessToken)
       router.push("/admin/dashboard");
     } else {
       console.log("Invalid credentials", data);
@@ -70,14 +64,14 @@ const page = () => {
   };
 
   return (
-    <div className="bg-gray-800 flex items-center justify-center min-h-screen px-4 py-8">
+    <div className="bg-gray-800 flex items-center justify-center min-h-screen px-4 py-8 font-sans">
       <div className="w-full max-w-md">
         <div className="border border-gray-300 rounded-lg p-2 w-full">
           <h2 className="text-white text-xl sm:text-2xl font-serif text-center mb-4">
             ADMIN LOGIN
           </h2>
           <div className="flex items-center justify-center">
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className=" w-80">
               {errors.general && (
                 <p className="text-red-500 text-xs mb-4">{errors.general}</p>
               )}

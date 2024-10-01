@@ -6,13 +6,48 @@ import { useParams, useRouter } from "next/navigation";
 import useAuthStore from "@/store/authStore";
 import { IoIosChatbubbles } from "react-icons/io";
 import UserNav from "@/components/UserNav";
+import { User } from "@/Types/chat";
+import { fetchUser } from "@/services/userApi";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const GroupChatPage: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
+  const [currentUser, setCurrentUser] = useState<User>()
   const containerRef = useRef<HTMLDivElement>(null);
   const [zp, setZp] = useState<ZegoUIKitPrebuilt | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("userAccessToken");
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
+      try {
+        const data = await fetchUser(token as string);
+        setCurrentUser(data)
+        
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, []);
+
 
   useEffect(() => {
     const setupGroupChat = async () => {

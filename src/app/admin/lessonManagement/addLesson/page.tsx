@@ -13,6 +13,7 @@ import { fetchLanguages } from "@/services/languageApi";
 import { fetchCategories } from "@/services/categoryApi";
 import { addLesson } from "@/services/lessonApi";
 import { X } from "lucide-react";
+import useAdminAuthStore from "@/store/adminAuthStore";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -29,6 +30,7 @@ interface Category {
 }
 
 const AddLessonPage = () => {
+  const {token, adminLogout} = useAdminAuthStore()
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -48,7 +50,6 @@ const AddLessonPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("adminAccessToken");
     const fetchLanguagesData = async () => {
       try {
         const data = await fetchLanguages(token as string);
@@ -137,7 +138,6 @@ const AddLessonPage = () => {
     formData.append("categoryName", category?.value || "");
 
     try {
-      const token = localStorage.getItem("adminAccessToken");
       const response = await addLesson(token as string, formData);
       if (response.status === 201) {
         toast.success("Lesson added successfully!");
@@ -147,11 +147,8 @@ const AddLessonPage = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.error("Token expired or unauthorized. Redirecting to login...");
-        localStorage.removeItem("adminAccessToken");
-        localStorage.removeItem("admin");
         toast.error("Token expired...Login again!");
-        router.push("/admin");
+        adminLogout()
       } else {
         console.error("Error adding lesson:", error);
       }
@@ -160,7 +157,7 @@ const AddLessonPage = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col font-sans">
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-4 w-full mt-5">
             <h1 className="text-3xl text-white">Add Lesson</h1>

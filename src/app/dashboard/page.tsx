@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import {
-  FaLanguage,
   FaUser,
   FaBook,
   FaUsers,
@@ -16,11 +15,11 @@ import useAuthStore from "@/store/authStore";
 import ProtectedRoute from "@/HOC/ProtectedRoute";
 import LoadingPage from "@/components/Loading";
 import Modal from "@/components/Modal";
-import { translateLanguage } from "@/services/lessonApi";
 import Image from "next/image";
-import { checkBlock } from "@/services/userApi";
+import {fetchUser } from "@/services/userApi";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
+import { User } from "@/Types/chat";
 
 interface DashboardCardProps {
   title: string;
@@ -31,7 +30,8 @@ interface DashboardCardProps {
 
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(false);
-  const { isLoading, user, isAuthenticated, logout } = useAuthStore();
+  const { isLoading, user, isAuthenticated, logout ,} = useAuthStore();
+  const [currentUser, setCurrentUser] = useState<User>()
   const router = useRouter();
 
 
@@ -42,18 +42,21 @@ const Dashboard = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
-
-    const checking = async () => {
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
       try {
-        const check = await checkBlock(token as string);
-        console.log(check);
+        const data = await fetchUser(token as string);
+        setCurrentUser(data)
+        
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              localStorage.removeItem("userAccessToken");
-              router.push("/login");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
             }
           } else {
             toast.error("An unexpected error occurred in login");
@@ -63,8 +66,7 @@ const Dashboard = () => {
         }
       }
     };
-
-    checking();
+    fetchCurrentUser();
   }, []);
 
   if (isLoading) return <LoadingPage />;
@@ -101,9 +103,9 @@ const Dashboard = () => {
               onClick={() => router.push("/profile")}
               className="relative w-10 h-10 rounded-full overflow-hidden"
             >
-              {user.user?.profilePhoto ? (
+              {currentUser?.profilePhoto ? (
                 <Image
-                  src={user.user.profilePhoto}
+                  src={currentUser?.profilePhoto}
                   alt="Profile"
                   layout="fill"
                   objectFit="cover"

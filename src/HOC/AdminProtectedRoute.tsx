@@ -1,33 +1,3 @@
-// import { useEffect } from 'react';
-// import { useRouter } from 'next/navigation';
-// import useAuthStore from '@/store/adminAuthStore';
-// import LoadingPage from '@/components/Loading';
-
-// const protectedRoute = (WrappedComponent: React.ComponentType) => {
-//   return function ProtectedComponent(props: any) {
-//     const { isAdminAuthenticated, isLoading, initAdminAuth } = useAuthStore();
-//     const router = useRouter();
-
-//     useEffect(() => {
-//       initAdminAuth();
-//     }, []);
-
-//     useEffect(() => {
-//       if (!isLoading && !isAdminAuthenticated) {
-//         router.push('/admin');
-//       }
-//     }, [isLoading, isAdminAuthenticated, router]);
-
-//     if (isLoading) {
-//       return <LoadingPage/>;
-//     }
-
-//     return isAdminAuthenticated ? <WrappedComponent {...props} /> : null;
-//   };
-// };
-
-// export default protectedRoute;
-
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import useAdminAuthStore from '@/store/adminAuthStore';
@@ -52,7 +22,7 @@ const protectedRoute = (WrappedComponent: React.ComponentType) => {
           adminLogout();
           router.push('/admin');
         }
-      }, 60000); // Check every minute
+      }, 60000); 
 
       return () => clearInterval(tokenCheckInterval);
     }, [checkTokenValidity, adminLogout, router]);

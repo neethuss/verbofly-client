@@ -19,7 +19,7 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { fetchCountries } from "@/services/countryApi";
 import { fetchLanguages } from "@/services/languageApi";
-import { checkBlock, updateProfileImage, updateUser } from "@/services/userApi";
+import { checkBlock, fetchUser, updateProfileImage, updateUser } from "@/services/userApi";
 import UserNav from "@/components/UserNav";
 import Modal from "@/components/Modal";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -63,37 +63,8 @@ const EditProfile: React.FC = () => {
   const [showModal, setShowModal] = useState(false)
 
   const router = useRouter();
-  const { isAuthenticated, setUser,logout } = useAuthStore();
+  const { logout } = useAuthStore();
 
-  
-  useEffect(() => {
-    const token = localStorage.getItem("userAccessToken");
-
-    const checking = async () => {
-      try {
-        const check = await checkBlock(token as string);
-        console.log(check);
-        
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response) {
-            if (error.response.status === 403) {
-              toast.error("User is blocked");
-              localStorage.removeItem('userAccessToken')
-              router.push('/login')
-            }
-          } else {
-              toast.error("An unexpected error occurred in login");
-          }
-        
-        } else {
-          toast.error("An error occurred during login. Please try again.");
-        }
-      }
-    };
-
-    checking();
-  }, []);
   
 
   useEffect(() => {
@@ -144,16 +115,20 @@ const EditProfile: React.FC = () => {
             : []
         );
       } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.error(
-            "Token expired or unauthorized. Redirecting to login..."
-          );
-          localStorage.removeItem("userAccessToken");
-          localStorage.removeItem("user");
-          toast.error("Token expired...Login again!");
-          router.push("/login");
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
         } else {
-          console.error("Error fetching user data:", error);
+          toast.error("An error occurred during login. Please try again.");
         }
       }
     };

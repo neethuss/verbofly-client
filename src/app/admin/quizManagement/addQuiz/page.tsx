@@ -8,6 +8,7 @@ import { fetchCategories } from "@/services/categoryApi";
 import { addQuiz } from "@/services/quizApi";
 import { toast, ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
+import useAdminAuthStore from "@/store/adminAuthStore";
 
 interface ILanguage {
   _id: string;
@@ -31,6 +32,7 @@ interface IQuizQuestion {
 }
 
 const Page = () => {
+  const {token, adminLogout} = useAdminAuthStore()
   const [name, setName] = useState<string>("");
   const [languages, setLanguages] = useState<ILanguage[]>([]);
   const [categories, setCategories] = useState<ICategory[]>([]);
@@ -46,8 +48,6 @@ const Page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const token = localStorage.getItem("adminAccessToken");
-
     const fetchLanguagesData = async () => {
       const data = await fetchLanguages(token as string);
       setLanguages(data.languages);
@@ -83,8 +83,6 @@ const Page = () => {
     const newOptions = [...newQuestion.options];
     newOptions[index] = { option: e.target.value };
     setNewQuestion({ ...newQuestion, options: newOptions });
-    // console.log(newQuestion.options)
-    // console.log(questions,'ques')
   };
 
   const handleCorrectAnswerChange = (
@@ -114,7 +112,6 @@ const Page = () => {
   };
 
   const handleAddQuiz = async () => {
-    const token = localStorage.getItem("adminAccessToken");
     try {
       console.log("handleAddQuiz");
       const response = await addQuiz(
@@ -138,7 +135,7 @@ const Page = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen p-4 flex flex-col">
+      <div className="min-h-screen p-4 flex flex-col font-sans">
         <div className="flex justify-between items-center mb-6">
           <h1 className="text-3xl font-bold text-white">Add New Quiz</h1>
           <button onClick={()=> router.push('/admin/quizManagement')} className="bg-transparent border border-gray-500 text-white px-4 py-2 rounded-full hover:bg-gray-700 transition-colors">

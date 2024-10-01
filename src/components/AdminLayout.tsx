@@ -12,33 +12,32 @@ const AdminLayout = ({ children }: { children: React.ReactNode }) => {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   return (
-    <div className="min-h-screen flex flex-col md:flex-row bg-gray-900">
-
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-gray-900 shadow-md">
+    <div className="h-screen flex flex-col md:flex-row bg-gray-900 overflow-hidden">
+      <header className="md:hidden fixed top-0 left-0 right-0 z-50 bg-gray-900 shadow-md h-12">
         <div className="py-2 px-4 flex justify-between items-center">
           <Image src={logo} alt="TalkTrek" width={120} height={40} className='h-8 w-auto'/>
           <button onClick={toggleSidebar} className="text-white">
             <FaBars size={24} />
           </button>
         </div>
-      </div>
-
-      <div className={`
+      </header>
+      <aside className={`
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-        md:translate-x-0 fixed md:static inset-y-0 left-0 z-50 
-        w-64 bg-gray-900 overflow-y-auto transition-transform duration-300 ease-in-out
+        md:translate-x-0 fixed md:relative top-0 left-0 z-50 
+        w-52 bg-gray-900 transition-transform duration-300 ease-in-out
+        h-screen flex flex-col
       `}>
-        <div className="min-h-screen p-4 border-r-2 border-gray-800">
+        <div className="flex flex-col p-4 border-r-2 border-gray-800 h-full overflow-y-auto">
           <div className="mb-4 hidden md:flex items-center w-[150px] h-[50px]">
             <Image src={logo} alt="TalkTrek" />
           </div>
           <AdminSidebar onClose={() => setSidebarOpen(false)} />
         </div>
-      </div>
+      </aside>
 
-      <div className="flex-grow  p-4 md:p-6 mt-16 md:mt-0">
+      <main className="flex-grow md:h-screen overflow-y-auto p-4 md:p-6 mt-12 md:mt-0">
         {children}
-      </div>
+      </main>
 
       {sidebarOpen && (
         <div 

@@ -6,10 +6,10 @@ import Link from "next/link";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-darkBlue from-blue-100 to-white text-white">
+    <main className="min-h-screen bg-gray-900 from-blue-100 to-white text-white font-sans">
       <div className="container min-h-screen mx-auto px-4 py-16 flex flex-col justify-center items-center text-center">
         <div className="mb-5">
-        <h1 className="bg-gradient-to-r from-blue-600 via-green-500 to-indigo-400 inline-block text-transparent bg-clip-text text-5xl font-bold">
+        <h1 className="bg-gradient-to-r from-yellow-600 via-blue-500 to-yellow-400 inline-block text-transparent bg-clip-text text-5xl font-bold">
           Talk Trek
         </h1>
         </div>
@@ -36,7 +36,7 @@ export default function Home() {
       </div>
 
       <div className="container mx-auto px-4 py-16">
-        <div className="bg-gray-900 min-h-screen flex items-center justify-center rounded-lg mb-16">
+        <div className="flex justify-start rounded-lg mb-16">
           <div className="flex flex-col md:flex-row items-center p-8 w-full md:w-3/4">
             <div className="md:w-1/2 mb-8 md:mb-0">
               <Image
@@ -59,7 +59,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="bg-gray-900 min-h-screen flex items-center justify-center rounded-lg mb-16">
+        <div className="flex justify-end rounded-lg mb-16">
           <div className="flex flex-col md:flex-row-reverse items-center p-8 w-full md:w-3/4">
             <div className="md:w-1/2 mb-8 md:mb-0">
               <Image
@@ -82,7 +82,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="bg-gray-900 min-h-screen flex items-center justify-center rounded-lg">
+        <div className="flex justify-start rounded-lg">
           <div className="flex flex-col md:flex-row items-center p-8 w-full md:w-3/4">
             <div className="md:w-1/2 mb-8 md:mb-0">
               <Image
@@ -111,28 +111,28 @@ export default function Home() {
           <h2 className="text-3xl font-bold text-center mb-12">How It Works</h2>
           <div className="flex flex-col md:flex-row justify-between items-center space-y-8 md:space-y-0 md:space-x-8">
             <div className="bg-gray-700 text-darkBlue p-6 rounded-lg shadow-md text-center">
-              <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+              <div className="bg-yellow-500 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
                 <span className="text-xl font-bold">1</span>
               </div>
               <h3 className="text-xl font-bold mb-2">Sign Up</h3>
               <p>Create your profile and set your language goals.</p>
             </div>
             <div className="bg-gray-700 text-darkBlue p-6 rounded-lg shadow-md text-center">
-              <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+              <div className="bg-yellow-500 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
                 <span className="text-xl font-bold">2</span>
               </div>
               <h3 className="text-xl font-bold mb-2">Connect</h3>
               <p>Find native speakers and send connection requests.</p>
             </div>
             <div className="bg-gray-700 text-darkBlue p-6 rounded-lg shadow-md text-center">
-              <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+              <div className="bg-yellow-500 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
                 <span className="text-xl font-bold">3</span>
               </div>
               <h3 className="text-xl font-bold mb-2">Learn</h3>
               <p>Take lessons and practice through conversations.</p>
             </div>
             <div className="bg-gray-700 text-darkBlue p-6 rounded-lg shadow-md text-center">
-              <div className="bg-blue-600 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
+              <div className="bg-yellow-500 text-white rounded-full w-12 h-12 flex items-center justify-center mx-auto mb-4">
                 <span className="text-xl font-bold">4</span>
               </div>
               <h3 className="text-xl font-bold mb-2">Improve</h3>

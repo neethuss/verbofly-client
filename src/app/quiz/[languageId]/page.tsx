@@ -9,6 +9,10 @@ import { fetchLanguageById } from "@/services/languageApi";
 import { FaLock, FaBookOpen, FaUserGraduate, FaChalkboardTeacher } from "react-icons/fa";
 import { useRouter } from "next/navigation";
 import useAuthStore from "@/store/authStore";
+import { User } from "@/Types/chat";
+import axios from "axios";
+import { fetchUser } from "@/services/userApi";
+import { toast } from "react-toastify";
 
 interface ICategory {
   _id: string;
@@ -22,13 +26,43 @@ interface ILanguage {
 
 const page = () => {
   const { languageId } = useParams();
+  const [currentUser, setCurrentUser] = useState<User>()
   const [categories, setCategories] = useState<ICategory[]>([]);
   const [language, setLanguage] = useState<ILanguage>()
   const [subscribed, setSubscribed] = useState<boolean>(false)
   const [showModal, setShowModal] = useState<boolean>(false)
 
   const router = useRouter()
-  const { user } = useAuthStore();
+  const { user, logout } = useAuthStore();
+
+  useEffect(() => {
+    const token = localStorage.getItem("userAccessToken");
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
+      try {
+        const data = await fetchUser(token as string);
+        setCurrentUser(data)
+        
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");

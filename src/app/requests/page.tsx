@@ -10,6 +10,7 @@ import useAuthStore from "@/store/authStore";
 import { FaUser } from "react-icons/fa";
 import { IoMdGlobe } from "react-icons/io";
 import { MdLanguage } from "react-icons/md";
+import axios from "axios";
 
 interface Country {
   countryName: string;
@@ -40,7 +41,7 @@ const IncomingRequestsPage = () => {
     Record<string, { text: string; color: string }>
   >({});
   const router = useRouter();
-  const { setUser } = useAuthStore();
+  const { setUser ,logout} = useAuthStore();
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
@@ -92,23 +93,29 @@ const IncomingRequestsPage = () => {
 
         setButtonStates(initialButtonStates);
       } catch (error) {
-        handleFetchError(error);
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
       }
     };
 
-    const handleFetchError = (error: any) => {
-      if (error.response?.status === 401) {
-        localStorage.removeItem("userAccessToken");
-        localStorage.removeItem("user");
-        toast.error("Token expired...Login again!");
-        router.push("/login");
-      } else {
-        console.error("Error fetching data:", error);
-      }
-    };
 
     fetchData();
   }, [router, setUser]);
+
+
 
   const handleClick = async (buttonText: string, requestId: string) => {
     const token = localStorage.getItem("userAccessToken");
@@ -136,10 +143,10 @@ const IncomingRequestsPage = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-gray-900 text-white font-sans">
+    <div className="flex flex-col md:flex-row h-screen bg-gray-900 text-white font-sans lg:ml-24">
       <UserNav/>
 
-      <main className="flex flex-1 flex-col items-center p-8">
+      <main className="flex flex-1 flex-col items-center p-8 sm:mt-2">
         <h1 className="text-4xl font-bold mb-8">Incoming Requests</h1>
 
         <div className="w-full max-w-4xl">

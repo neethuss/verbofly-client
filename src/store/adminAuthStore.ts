@@ -1,64 +1,13 @@
-// import {create} from 'zustand';
-// import { devtools, persist } from 'zustand/middleware';
-
-// interface AdminAuthState {
-//   admin: any | null;
-//   isAdminAuthenticated: boolean;
-//   isLoading: boolean;
-//   setAdminAuth: (admin: any) => void;
-//   setAdmin: (admin: any) => void;
-//   adminLogout: () => void;
-//   initAdminAuth: () => void;
-// }
-
-// const useAdminAuthStore = create<AdminAuthState>()(
-//   devtools(
-//     persist(
-//       (set) => ({
-//         admin: null,
-//         isAdminAuthenticated: false,
-//         isLoading: true,
-//         setAdminAuth: (admin) => {
-//           localStorage.setItem('admin', JSON.stringify(admin));
-//           localStorage.setItem('adminAccessToken', admin.accessToken);
-//           set({ admin, isAdminAuthenticated: true, isLoading: false });
-//         },
-//         setAdmin: (admin) => {
-//           set({ admin });
-//         },
-//         adminLogout: () => {
-//           localStorage.removeItem('admin');
-//           localStorage.removeItem('adminAccessToken');
-//           set({ admin: null, isAdminAuthenticated: false, isLoading: false });
-//         },
-//         initAdminAuth: () => {
-//           const admin = JSON.parse(localStorage.getItem('admin') || 'null');
-//           const token = localStorage.getItem('adminAccessToken');
-//           if (admin && token) {
-//             set({ admin, isAdminAuthenticated: true, isLoading: false });
-//           } else {
-//             set({ admin: null, isAdminAuthenticated: false, isLoading: false });
-//           }
-//         },
-//       }),
-//       {
-//         name: 'admin-auth-storage',
-//       }
-//     ),
-//     { name: "AdminAuthStore" }
-//   )
-// );
-
-// export default useAdminAuthStore;
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
-import { jwtDecode } from 'jwt-decode'; // Make sure to install this package
+import { jwtDecode } from 'jwt-decode';
 
 interface AdminAuthState {
   admin: any | null;
+  token:string|null;
   isAdminAuthenticated: boolean;
   isLoading: boolean;
-  setAdminAuth: (admin: any) => void;
+  setAdminAuth: (admin: any, token :string) => void;
   setAdmin: (admin: any) => void;
   adminLogout: () => void;
   initAdminAuth: () => Promise<void>;
@@ -70,12 +19,13 @@ const useAdminAuthStore = create<AdminAuthState>()(
     persist(
       (set, get) => ({
         admin: null,
+        token:null,
         isAdminAuthenticated: false,
         isLoading: true,
-        setAdminAuth: (admin) => {
+        setAdminAuth: (admin, token) => {
           localStorage.setItem('admin', JSON.stringify(admin));
-          localStorage.setItem('adminAccessToken', admin.accessToken);
-          set({ admin, isAdminAuthenticated: true, isLoading: false });
+          localStorage.setItem('adminAccessToken', token);
+          set({ admin,token, isAdminAuthenticated: true, isLoading: false });
         },
         setAdmin: (admin) => {
           set({ admin });
@@ -83,7 +33,7 @@ const useAdminAuthStore = create<AdminAuthState>()(
         adminLogout: () => {
           localStorage.removeItem('admin');
           localStorage.removeItem('adminAccessToken');
-          set({ admin: null, isAdminAuthenticated: false, isLoading: false });
+          set({ admin: null,token:null, isAdminAuthenticated: false, isLoading: false });
         },
         initAdminAuth: async () => {
           console.log('store initAdmin')

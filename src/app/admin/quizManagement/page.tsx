@@ -9,6 +9,7 @@ import AdminProtedctedRoute from "@/HOC/AdminProtectedRoute";
 import { fetchLessons, lessonBlockUnblock } from "@/services/lessonApi";
 import Modal from "@/components/Modal";
 import { fetchQuizzes } from "@/services/quizApi";
+import useAdminAuthStore from "@/store/adminAuthStore";
 
 interface IQuizOtpion {
   option: string;
@@ -39,6 +40,7 @@ interface IQuiz {
 }
 
 const page = () => {
+  const {token, adminLogout} = useAdminAuthStore()
   const [quizzes, setQuizzes] = useState<IQuiz[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
   const [page, setPage] = useState<number>(1);
@@ -49,7 +51,6 @@ const page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    let token = localStorage.getItem("adminAccessToken");
     const fetchQuizzesdata = async () => {
       try {
         const data = await fetchQuizzes(
@@ -65,13 +66,8 @@ const page = () => {
         console.log(data, "quizzes");
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.error(
-            "Token expired or unauthorized. Redirecting to login..."
-          );
-          localStorage.removeItem("adminAccessToken");
-          localStorage.removeItem("admin");
           toast.error("Token expired...Login again!");
-          router.push("/admin");
+          adminLogout()
         } else {
           console.error("Error fetching lessons data:", error);
         }
@@ -94,7 +90,7 @@ const page = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen font-sans">
       <AdminLayout>
         <div className="flex flex-col h-full">
           <div className="flex-grow overflow-hidden">

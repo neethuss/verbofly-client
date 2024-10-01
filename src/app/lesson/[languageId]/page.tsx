@@ -8,6 +8,8 @@ import { FaBookOpen } from 'react-icons/fa';
 import ProtectedRoute from '@/HOC/ProtectedRoute'
 import UserNav from '@/components/UserNav';
 import useAuthStore from '@/store/authStore';
+import { fetchUser } from '@/services/userApi';
+import { User } from '@/Types/chat';
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -19,9 +21,40 @@ interface Language {
 
 const LessonPage = () => {
   const [language, setLanguage] = useState<Language>();
+  const [currentUser, setCurrentUser] = useState<User>()
   const router = useRouter();
   const { languageId } = useParams();
   const {logout} = useAuthStore()
+
+  useEffect(() => {
+    const token = localStorage.getItem("userAccessToken");
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
+      try {
+        const data = await fetchUser(token as string);
+        setCurrentUser(data)
+        
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, []);
+
 
   useEffect(() => {
     const fetchLanguage = async () => {

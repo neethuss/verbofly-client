@@ -8,7 +8,13 @@ import { ToastContainer, toast } from "react-toastify";
 import { fetchLessonsOnLanguage } from "../../services/lessonApi";
 import axios from "axios";
 import Head from "next/head";
-import { FaGlobe, FaFire, FaBook, FaRocket } from "react-icons/fa";
+import {
+  FaGlobe,
+  FaFire,
+  FaBook,
+  FaRocket,
+  FaSkullCrossbones,
+} from "react-icons/fa";
 import ProtectedRoute from "@/HOC/ProtectedRoute";
 import useAuthStore from "@/store/authStore";
 import UserNav from "@/components/UserNav";
@@ -54,41 +60,13 @@ const ProgressPage: React.FC = () => {
   const [progressLessons, setProgressLessons] = useState<Lesson[]>([]);
   const [targetLanguage, setTargetLanguage] = useState<string>("");
   const [streak, setStreak] = useState<number>(0);
-  const [quizAttempted, setQuizAttempted] = useState<number>(0)
-  const [quizFailed, setQuizFailed] = useState<number>(0)
-  const [quizWin, setQuizWin] = useState<number>(0)
+  const [quizAttempted, setQuizAttempted] = useState<number>(0);
+  const [quizFailed, setQuizFailed] = useState<number>(0);
+  const [quizWin, setQuizWin] = useState<number>(0);
 
-
-  const { setUser } = useAuthStore();
+  const { setUser ,logout} = useAuthStore();
   const router = useRouter();
-
-  useEffect(() => {
-    const token = localStorage.getItem("userAccessToken");
-
-    const checking = async () => {
-      try {
-        const check = await checkBlock(token as string);
-        console.log(check);
-      } catch (error) {
-        if (axios.isAxiosError(error)) {
-          if (error.response) {
-            if (error.response.status === 403) {
-              toast.error("User is blocked");
-              localStorage.removeItem("userAccessToken");
-              router.push("/login");
-            }
-          } else {
-            toast.error("An unexpected error occurred in login");
-          }
-        } else {
-          toast.error("An error occurred during login. Please try again.");
-        }
-      }
-    };
-
-    checking();
-  }, []);
-
+  
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
     const user = localStorage.getItem("user");
@@ -106,18 +84,18 @@ const ProgressPage: React.FC = () => {
         const languageData = await fetchLanguages(token);
         setLanguages(languageData.languages);
       } catch (error) {
-        handleFetchError(error);
-      }
-    };
-
-    const handleFetchError = (error: any) => {
-      if (error.response?.status === 401) {
-        localStorage.removeItem("userAccessToken");
-        localStorage.removeItem("user");
-        toast.error("Token expired...Login again!");
-        router.push("/login");
-      } else {
-        console.error("Error fetching data:", error);
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
       }
     };
 
@@ -148,9 +126,9 @@ const ProgressPage: React.FC = () => {
           const languageProgress = response.data.languages.find(
             (lang: any) => lang.language._id === languageId
           );
-          setQuizAttempted(languageProgress.quizAttempted)
-          setQuizFailed(languageProgress.quizFailed)
-          setQuizWin(languageProgress.quizWin)
+          setQuizAttempted(languageProgress.quizAttempted);
+          setQuizFailed(languageProgress.quizFailed);
+          setQuizWin(languageProgress.quizWin);
 
           if (languageProgress) {
             const progressLessons = languageProgress.lessons.map(
@@ -236,8 +214,8 @@ const ProgressPage: React.FC = () => {
                   </h3>
                 </div>
                 <p className="text-2xl sm:text-3xl font-bold text-yellow-400">
-                {progressLessons.length} /{""}
-                {progressLessons.length + newLessons.length}
+                  {progressLessons.length} /{""}
+                  {progressLessons.length + newLessons.length}
                 </p>
               </div>
 
@@ -273,14 +251,16 @@ const ProgressPage: React.FC = () => {
                       className="shadow-none flex flex-col text-center whitespace-nowrap text-white justify-center bg-yellow-400"
                     ></div>
                   </div>
-                  <p className="text-sm text-white font-semibold">
-                    {Math.round(
-                      (progressLessons.length /
-                        (progressLessons.length + newLessons.length)) *
-                        100
-                    )}
-                    % Complete
-                  </p>
+                  {progressLessons.length > 0 && (
+                    <p className="text-sm text-white font-semibold">
+                      {Math.round(
+                        (progressLessons.length /
+                          (progressLessons.length + newLessons.length)) *
+                          100
+                      )}
+                      % Complete
+                    </p>
+                  )}
                 </div>
               </div>
             </div>
@@ -314,7 +294,7 @@ const ProgressPage: React.FC = () => {
 
               <div className="bg-gray-800 p-4 rounded-lg shadow-lg border border-gray-700">
                 <div className="flex items-center mb-2">
-                  <CgCloseR className="text-2xl sm:text-3xl text-yellow-400" />
+                  <FaSkullCrossbones className="text-2xl sm:text-3xl text-yellow-400" />
                   <h3 className="text-base sm:text-lg font-semibold ml-2 text-white">
                     Quiz Failed
                   </h3>
@@ -323,7 +303,6 @@ const ProgressPage: React.FC = () => {
                   {quizFailed}
                 </p>
               </div>
-
             </div>
           )}
 

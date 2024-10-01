@@ -13,7 +13,7 @@ import { toast, ToastContainer } from "react-toastify";
 import UserNav from "@/components/UserNav";
 import useAuthStore from "@/store/authStore";
 import ProtectedRoute from "@/HOC/ProtectedRoute";
-import { checkBlock } from "@/services/userApi";
+import { checkBlock, fetchUser } from "@/services/userApi";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -45,65 +45,36 @@ const UserProfile: React.FC = () => {
   const router = useRouter();
   const { isAuthenticated, setUser, logout } = useAuthStore();
 
-  
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
-
-    const checking = async () => {
+    const fetchCurrentUser = async () => {
       try {
-        const check = await checkBlock(token as string);
-        console.log(check);
+        const data = await fetchUser(token as string);
+        setCurrentUser(data)
         
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              localStorage.removeItem('userAccessToken')
-              router.push('/login')
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
             }
           } else {
-              toast.error("An unexpected error occurred in login");
+            toast.error("An unexpected error occurred in login");
           }
-        
         } else {
           toast.error("An error occurred during login. Please try again.");
         }
       }
     };
-
-    checking();
+    fetchCurrentUser();
   }, []);
-  
 
-  useEffect(() => {
-    if (!isAuthenticated) {
-      router.push("/login");
-    }
-    const fetchUser = async () => {
-      try {
-        const response = await axios.get(`${BACKEND_URL}/api/user`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("userAccessToken")}`,
-          },
-        });
-        setCurrentUser(response.data);
-        setUser(response.data);
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.error("Token expired or unauthorized. Redirecting to login...");
-          localStorage.removeItem("userAccessToken");
-          localStorage.removeItem("user");
-          toast.error("Token expired...Login again!");
-          router.push("/login");
-        } else {
-          console.error("Error fetching user data:", error);
-        }
-      }
-    };
 
-    fetchUser();
-  }, [isAuthenticated, router, setUser]);
+
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-900 text-white font-sans">

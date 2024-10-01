@@ -9,6 +9,7 @@ import AdminProtedctedRoute from "@/HOC/AdminProtectedRoute";
 import Select from "react-select";
 import { LanguageErrors } from "@/utils/Types";
 import { languageSchema } from "@/utils/Validation";
+import useAdminAuthStore from "@/store/adminAuthStore";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -19,6 +20,7 @@ interface Country {
 }
 
 const page = () => {
+  const {token, adminLogout} = useAdminAuthStore()
   const [languageName, setLanguageName] = useState<string>("");
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
@@ -34,7 +36,7 @@ const page = () => {
         `${BACKEND_URL}/country/countries`,
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("adminAccessToken")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -85,7 +87,7 @@ const page = () => {
         { languageName, countries: selectedCountries },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("adminAccessToken")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -104,7 +106,7 @@ const page = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col font-sans">
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-4 w-full mt-5">
             <h1 className="text-3xl text-white">Add Language</h1>

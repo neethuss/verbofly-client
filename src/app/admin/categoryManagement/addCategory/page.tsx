@@ -8,10 +8,12 @@ import axios from "axios";
 import AdminProtedctedRoute from '@/HOC/AdminProtectedRoute';
 import { CategoryErrors } from "@/utils/Types";
 import { categorySchema } from "@/utils/Validation";
+import useAdminAuthStore from "@/store/adminAuthStore";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const page = () => {
+  const {token} = useAdminAuthStore()
   const [categoryName, setCategoryName] = useState<string>("");
   const [errors, setErrors] = useState<CategoryErrors>({});
 
@@ -42,7 +44,7 @@ const page = () => {
         categoryName
       },{
         headers :{
-          Authorization:`Bearer ${localStorage.getItem('adminAccessToken')}`
+          Authorization:`Bearer ${token}`
         }
       })
       if (response.status === 201) {
@@ -67,7 +69,7 @@ const page = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col font-sans">
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-4 w-full mt-5">
             <h1 className="text-3xl text-white">Add Category</h1>

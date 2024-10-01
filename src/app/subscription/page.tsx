@@ -13,28 +13,50 @@ import { FaUsers } from "react-icons/fa";
 import { CiSquareQuestion } from "react-icons/ci";
 import UserNav from "@/components/UserNav";
 import { useRouter } from "next/navigation";
+import { fetchUser } from "@/services/userApi";
+import { User } from "@/Types/chat";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 function Subscription() {
-  const { user , isAuthenticated} = useAuthStore();
-
+  const {logout} = useAuthStore()
   const [amount, setAmount] = useState("0");
+  const [currentUser, setCurrentUser] = useState<User>()
   const [currency, setCurrency] = useState("INR");
   const [subscribed, setSubscribed] = useState(false);
   const [expiryDate, setExpiryDate] = useState<Date | undefined>(undefined);
-  const router = useRouter()
+  const router = useRouter();
 
-  console.log(user.user, "user aar");
   useEffect(() => {
-
-    
-
-    if (user.user.isSubscribed) {
-      setSubscribed(true);
-      const date = new Date(user.user.expirationDate);
-      setExpiryDate(date);
-    }
-  }, [user]);
+    const token = localStorage.getItem("userAccessToken");
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
+      try {
+        const data = await fetchUser(token as string);
+        console.log(data,'what')
+        setCurrentUser(data)
+        setSubscribed(data.isSubscribed);
+        const date = new Date(data.expirationDate);
+        setExpiryDate(date);
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, [subscribed]);
 
   const createOrderId = async () => {
     try {
@@ -66,7 +88,7 @@ function Subscription() {
         key: process.env.key_id,
         amount: 199 * 100,
         currency: currency,
-        name: user.user.username || "User",
+        name: currentUser?.username || "User",
         description: "description",
         order_id: orderId,
         handler: async function (paymentresponse: any) {
@@ -89,7 +111,7 @@ function Subscription() {
               const response = await axios.patch(
                 `${BACKEND_URL}/api/payment/update-subscription`,
                 {
-                  email: user.user?.email,
+                  email: currentUser?.email,
                   orderId: paymentresponse.razorpay_order_id,
                 },
                 {
@@ -126,8 +148,8 @@ function Subscription() {
           }
         },
         prefill: {
-          name: user.user.username,
-          email: user.user.email,
+          name: currentUser?.username,
+          email: currentUser?.email,
         },
         theme: {
           color: "#3399cc",
@@ -151,7 +173,7 @@ function Subscription() {
       />
 
       <div className="flex min-h-screen bg-gray-900 text-white font-sans">
-        <UserNav/>
+        <UserNav />
 
         <main className="flex flex-1 justify-center flex-col items-center p-8">
           <h1 className="text-4xl font-bold mb-8">Subscription</h1>
@@ -159,7 +181,9 @@ function Subscription() {
           {!subscribed ? (
             <div className="bg-gray-800 rounded-lg p-6 flex flex-col md:flex-row items-center shadow-lg transition duration-300 transform hover:-translate-y-1 hover:shadow-2xl max-w-4xl w-full">
               <div className="md:w-1/2 p-6">
-                <h2 className="text-2xl font-bold mb-4 text-yellow-400">Standard Plan</h2>
+                <h2 className="text-2xl font-bold mb-4 text-yellow-400">
+                  Standard Plan
+                </h2>
                 <p className="text-3xl font-bold mb-4">
                   ₹199<span className="text-sm font-normal">/month</span>
                 </p>
@@ -198,7 +222,9 @@ function Subscription() {
               <div className="text-yellow-400 text-6xl mb-4">
                 <TiTick />
               </div>
-              <h2 className="text-2xl font-bold mb-4 text-yellow-400">Active Subscription</h2>
+              <h2 className="text-2xl font-bold mb-4 text-yellow-400">
+                Active Subscription
+              </h2>
               <p className="text-center mb-4">
                 Your Standard Plan is active until{" "}
                 <span className="font-bold text-yellow-400">
@@ -207,7 +233,9 @@ function Subscription() {
               </p>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
                 <FeatureCard
-                  icon={<GiProgression className="text-yellow-400 text-4xl mb-4" />}
+                  icon={
+                    <GiProgression className="text-yellow-400 text-4xl mb-4" />
+                  }
                   title="All Lessons"
                   description="Access to all language learning content"
                 />
@@ -217,7 +245,9 @@ function Subscription() {
                   description="Connect with as many native speakers as you want"
                 />
                 <FeatureCard
-                  icon={<CiSquareQuestion className="text-yellow-400 text-4xl mb-4" />}
+                  icon={
+                    <CiSquareQuestion className="text-yellow-400 text-4xl mb-4" />
+                  }
                   title="Upcoming Features"
                   description="Get early access to new features"
                 />
@@ -237,7 +267,11 @@ interface FeatureCardProps {
   description: string;
 }
 
-const FeatureCard: React.FC<FeatureCardProps> = ({ icon, title, description }) => (
+const FeatureCard: React.FC<FeatureCardProps> = ({
+  icon,
+  title,
+  description,
+}) => (
   <div className="bg-gray-700 rounded-lg p-4 flex flex-col items-center text-center">
     {icon}
     <h3 className="text-lg font-semibold mb-2">{title}</h3>

@@ -17,6 +17,8 @@ import useAuthStore from "@/store/authStore";
 import { FaUsers } from "react-icons/fa";
 import { GiProgression } from "react-icons/gi";
 import { CiSquareQuestion } from "react-icons/ci";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 interface Country {
   countryName: string;
@@ -43,6 +45,7 @@ interface User {
 }
 
 const Page = () => {
+  const [user, setUser] = useState<User>()
   const [currentUser, setCurrentUser] = useState<User>();
   const [buttonText, setButtonText] = useState<string>("Connect");
   const [buttonColor, setButtonColor] = useState<string>(
@@ -50,7 +53,7 @@ const Page = () => {
   );
   const [showModal, setShowModal] = useState<boolean>(false)
 
-  const { user, setUser } = useAuthStore();
+  const { logout } = useAuthStore();
   const { nativeId } = useParams();
   const router = useRouter();
 
@@ -62,10 +65,40 @@ const Page = () => {
     setShowModal(false)
   }
 
+  useEffect(() => {
+    const token = localStorage.getItem("userAccessToken");
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
+      try {
+        const data = await fetchUser(token as string);
+        setUser(data)
+        
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, []);
+
+
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
-    const userId = user?.user?._id;
+    const userId = user?._id;
     const fetchUserData = async () => {
       try {
         const data = await fetchUserById(token as string, nativeId as string);

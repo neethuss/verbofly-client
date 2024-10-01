@@ -8,12 +8,13 @@ import { useParams, useRouter } from 'next/navigation'
 import AdminProtedctedRoute from '@/HOC/AdminProtectedRoute';
 import { CountryErrors } from '@/utils/Types'
 import { countrySchema } from '@/utils/Validation'
+import useAdminAuthStore from '@/store/adminAuthStore'
 
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const page = () => {
-
+const {token, adminLogout} = useAdminAuthStore()
   const [countryName, setCountryName] = useState<string>('')
   const [errors, setErrors] = useState<CountryErrors>({});
 
@@ -22,11 +23,10 @@ const page = () => {
 
   useEffect( () => {
     const fetchCountry = async() => {
-      console.log('back edit')
       try {
         const response = await axios.get(`${BACKEND_URL}/country/${editCountry}`,{
           headers :{
-            Authorization:`Bearer ${localStorage.getItem('adminAccessToken')}`
+            Authorization:`Bearer ${token}`
           }
         })
         if(response.status === 200){
@@ -63,7 +63,7 @@ const page = () => {
         countryName
       },{
         headers :{
-          Authorization:`Bearer ${localStorage.getItem('adminAccessToken')}`
+          Authorization:`Bearer ${token}`
         }
       })
       if(response.status === 200){
@@ -92,7 +92,7 @@ const page = () => {
 
   return (
     <AdminLayout>
-       <div className="min-h-screen flex flex-col">
+       <div className="min-h-screen flex flex-col font-sans">
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-4 w-full mt-5">
             <h1 className="text-3xl text-white">Edit Country</h1>

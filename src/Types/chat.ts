@@ -7,6 +7,7 @@ export interface LastMessage {
   senderName: string | undefined;
   image: string;
   audio:string
+  call:boolean
 }
 
 export interface Message {
@@ -16,6 +17,7 @@ export interface Message {
   messageText: string;
   image?: string;
   audio?:string
+  call?:boolean
   createdAt: string;
   readAt: Date;
 }

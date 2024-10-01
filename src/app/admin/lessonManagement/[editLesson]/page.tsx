@@ -13,6 +13,7 @@ import { fetchLanguages } from "@/services/languageApi";
 import { fetchCategories } from "@/services/categoryApi";
 import { X } from "lucide-react";
 import { lessonSchema } from "@/utils/Validation";
+import useAdminAuthStore from "@/store/adminAuthStore";
 
 interface Country {
   _id: string;
@@ -42,6 +43,7 @@ interface Lesson {
 }
 
 const Page = () => {
+  const {token, adminLogout} = useAdminAuthStore()
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -64,10 +66,8 @@ const Page = () => {
 
   useEffect(() => {
     const fetchLessonData = async () => {
-      const token = localStorage.getItem("adminAccessToken");
       try {
         const data = await fetchLesson(token as string, editLesson);
-        console.log(data, "current lesson for edit");
 
         setLesson(data);
         setTitle(data.title);
@@ -143,7 +143,6 @@ const Page = () => {
     formData.append("categoryName", selectedCategory?.value || "");
 
     try {
-      const token = localStorage.getItem("adminAccessToken");
       const response = await editALesson(token as string,editLesson, formData)
       if (response.status === 201) {
         toast.success("Lesson edited successfully!");
@@ -153,11 +152,8 @@ const Page = () => {
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        console.error("Token expired or unauthorized. Redirecting to login...");
-        localStorage.removeItem("adminAccessToken");
-        localStorage.removeItem("admin");
         toast.error("Token expired...Login again!");
-        router.push("/admin");
+       adminLogout()
       } else {
         console.error("Error adding lesson:", error);
       }
@@ -180,7 +176,7 @@ const Page = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col font-sans">
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-4 w-full mt-5">
             <h1 className="text-3xl text-white">Edit Lesson</h1>

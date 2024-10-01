@@ -8,6 +8,10 @@ import { useRouter } from "next/navigation";
 import AdminProtedctedRoute from "@/HOC/AdminProtectedRoute";
 import { fetchLanguages, languageBlockUnblock } from "@/services/languageApi";
 import Modal from "@/components/Modal";
+import { CiEdit } from "react-icons/ci";
+import { CgUnblock } from "react-icons/cg";
+import { MdBlock } from "react-icons/md";
+import useAdminAuthStore from "@/store/adminAuthStore";
 
 interface Country {
   _id: string;
@@ -22,6 +26,7 @@ interface Language {
 }
 
 const page = () => {
+  const {token, adminLogout} = useAdminAuthStore()
   const [languages, setLanguages] = useState<Language[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
   const [page, setPage] = useState<number>(1);
@@ -36,7 +41,6 @@ const page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    let token = localStorage.getItem("adminAccessToken");
     const fetchLanguagesData = async () => {
       try {
         const data = await fetchLanguages(
@@ -54,10 +58,8 @@ const page = () => {
           console.error(
             "Token expired or unauthorized. Redirecting to login..."
           );
-          localStorage.removeItem("adminAccessToken");
-          localStorage.removeItem("admin");
           toast.error("Token expired...Login again!");
-          router.push("/admin");
+          adminLogout()
         } else {
           console.error("Error fetching users data:", error);
         }
@@ -70,8 +72,6 @@ const page = () => {
     id: string,
     action: "block" | "unblock"
   ) => {
-    console.log("update block, unblock");
-    const token = localStorage.getItem("adminAccessToken");
     const data = await languageBlockUnblock(action, id, token as string);
     if (data) {
       setLanguages((prevLanguages) =>
@@ -113,7 +113,7 @@ const page = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen font-sans">
       <AdminLayout>
         <div className="flex flex-col h-full">
           <div className="flex-grow overflow-hidden">
@@ -174,31 +174,26 @@ const page = () => {
                         )}
                       </td>
                       <td className="px-4 py-2 text-white">
-                        <div className="flex justify-center">
-                          <button
-                            className="border rounded-3xl px-7 bg-blue-800 text-white hover:underline ml-2"
+                      <div className="flex justify-center gap-3">
+                          <CiEdit
+                            className=" text-blue-800 cursor-pointer"
                             onClick={() => handleEdit(language._id)}
-                          >
-                            Edit
-                          </button>
+                          />
+
                           {language.isBlocked ? (
-                            <button
-                              className="border rounded-3xl px-5 bg-green-600 text-white hover:underline ml-2"
+                            <CgUnblock
+                              className=" text-green-600 cursor-pointer"
                               onClick={() =>
                                 handleOpenModal(language._id, "unblock")
                               }
-                            >
-                              Unblock
-                            </button>
+                            />
                           ) : (
-                            <button
-                              className="border rounded-3xl px-5 bg-red-600 text-white hover:underline ml-2"
+                            <MdBlock
+                              className=" text-red-600 cursor-pointer"
                               onClick={() =>
                                 handleOpenModal(language._id, "block")
                               }
-                            >
-                              Block
-                            </button>
+                            />
                           )}
                         </div>
                       </td>

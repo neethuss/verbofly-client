@@ -8,6 +8,8 @@ import AdminProtedctedRoute from '@/HOC/AdminProtectedRoute';
 import { useRouter } from "next/navigation";
 import { fetchUsers, userBlockUnblock } from "@/services/userApi";
 import Modal from "@/components/Modal";
+import { CgUnblock } from "react-icons/cg";
+import { MdBlock } from "react-icons/md";
 
 interface Country {
   id: string;
@@ -105,7 +107,7 @@ const Page = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen flex flex-col p-4">
+      <div className="min-h-screen flex flex-col p-4 font-sans">
         <div className="flex-grow">
           <div className="flex flex-col sm:flex-row justify-between items-center mb-4 w-full mt-5">
             <h1 className="text-2xl sm:text-3xl text-white mb-4 sm:mb-0">Manage Users</h1>
@@ -155,19 +157,14 @@ const Page = () => {
                     </td>
                     <td className="px-4 py-2 text-white">
                       {user.isBlocked ? (
-                        <button
-                          className="border rounded pl-2 pr-2 bg-green-600 text-white hover:underline ml-2"
-                          onClick={() => handleOpenModal(user._id, "unblock")}
-                        >
-                          Unblock
-                        </button>
+                        <CgUnblock  className=" text-green-600 cursor-pointer"
+                        onClick={() => handleOpenModal(user._id, "unblock")}
+                      />
+                        
                       ) : (
-                        <button
-                          className="border rounded pl-2 pr-2 bg-red-600 text-white hover:underline ml-2"
-                          onClick={() => handleOpenModal(user._id, "block")}
-                        >
-                          Block
-                        </button>
+                        <MdBlock className=" text-red-600 cursor-pointer"
+                        onClick={() => handleOpenModal(user._id, "block")}/>
+          
                       )}
                     </td>
                   </tr>
@@ -175,7 +172,9 @@ const Page = () => {
               </tbody>
             </table>
           </div>
+          
         </div>
+      
 
         <div className="mt-auto py-4">
           <div className="flex justify-center items-center space-x-4">

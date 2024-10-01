@@ -7,9 +7,11 @@ import { useEffect, useState } from "react";
 import { fetchLanguages } from "@/services/languageApi";
 import Link from "next/link";
 import { toast, ToastContainer } from "react-toastify";
-import { checkBlock } from "@/services/userApi";
+import { checkBlock, fetchUser } from "@/services/userApi";
 import { useRouter } from "next/navigation";
 import axios from "axios";
+import { User } from "@/Types/chat";
+import useAuthStore from "@/store/authStore";
 
 interface ICountry {
   _id: string;
@@ -23,6 +25,8 @@ interface ILanguage {
 }
 
 const Quiz: React.FC = () => {
+  const {logout} = useAuthStore()
+  const [currentUser, setCurrenctUser] = useState<User>()
   const [languages, setLanguages] = useState<ILanguage[]>([]);
 
   const router = useRouter()
@@ -30,33 +34,32 @@ const Quiz: React.FC = () => {
   
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
-
-    const checking = async () => {
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
       try {
-        const check = await checkBlock(token as string);
-        console.log(check);
+        const data = await fetchUser(token as string);
+        setCurrenctUser(data)
         
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              localStorage.removeItem('userAccessToken')
-              router.push('/login')
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
             }
           } else {
-              toast.error("An unexpected error occurred in login");
+            toast.error("An unexpected error occurred in login");
           }
-        
         } else {
           toast.error("An error occurred during login. Please try again.");
         }
       }
     };
-
-    checking();
+    fetchCurrentUser();
   }, []);
-
   
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");

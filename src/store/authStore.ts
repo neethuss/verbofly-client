@@ -1,84 +1,31 @@
-// import {create} from 'zustand';
-// import { devtools, persist } from 'zustand/middleware';
-
-// interface AuthState {
-//   user: any | null;
-//   isAuthenticated: boolean;
-//   isLoading: boolean;
-//   setUserAuth: (user: any) => void;
-//   setUser: (user: any) => void;
-//   logout: () => void;
-//   initAuth: () => void;
-// }
-
-// const useAuthStore = create<AuthState>()(
-
-  
-//   devtools(
-//     persist(
-//       (set) => ({
-//         user: null,
-//         isAuthenticated: false,
-//         isLoading: true,
-//         setUserAuth: (user) => {
-//           localStorage.setItem('user', JSON.stringify(user));
-//           localStorage.setItem('userAccessToken', user.accessToken);
-//           set({ user, isAuthenticated: true, isLoading: false });
-//         },
-//         setUser: (user) => {
-//           set({ user });
-//         },
-//         logout: () => {
-//           localStorage.removeItem('user');
-//           localStorage.removeItem('userAccessToken');
-//           set({ user: null, isAuthenticated: false, isLoading: false });
-          
-//         },
-//         initAuth: () => {
-//           const user = JSON.parse(localStorage.getItem('user') || 'null');
-//           const token = localStorage.getItem('userAccessToken');
-//           if (user && token) {
-//             set({ user, isAuthenticated: true, isLoading: false });
-//           } else {
-//             set({ user: null, isAuthenticated: false, isLoading: false });
-//           }
-//         },
-//       }),
-//       {
-//         name: 'auth-storage',
-//       }
-//     ),
-//     { name: "AuthStore" }
-//   )
-// );
-
-// export default useAuthStore;
-
-
 import { create } from 'zustand';
 import { devtools, persist } from 'zustand/middleware';
+import { jwtDecode } from 'jwt-decode';
 
 interface AuthState {
   user: any | null;
+  token:string | null
   isAuthenticated: boolean;
   isLoading: boolean;
-  setUserAuth: (admin: any) => void;
+  setUserAuth: (admin: any, token:string) => void;
   setUser: (admin: any) => void;
   logout: () => void;
   initAuth: () => Promise<void>;
+  checkTokenValidity: () => boolean;
 }
 
 const useAuthStore = create<AuthState>()(
   devtools(
     persist(
-      (set) => ({
+      (set, get) => ({
         user: null,
+        token:null,
         isAuthenticated: false,
         isLoading: true,
-        setUserAuth: (user) => {
+        setUserAuth: (user, token) => {
           localStorage.setItem('user', JSON.stringify(user));
-          localStorage.setItem('userAccessToken', user.accessToken);
-          set({ user, isAuthenticated: true, isLoading: false });
+          localStorage.setItem('userAccessToken', token);
+          set({ user,token, isAuthenticated: true, isLoading: false });
         },
         setUser: (user) => {
           set({ user });
@@ -86,17 +33,29 @@ const useAuthStore = create<AuthState>()(
         logout: () => {
           localStorage.removeItem('user');
           localStorage.removeItem('userAccessToken');
-          set({ user: null, isAuthenticated: false, isLoading: false });
+          set({ user: null,token:null, isAuthenticated: false, isLoading: false });
         },
         initAuth: async () => {
           const user = JSON.parse(localStorage.getItem('user') || 'null');
           const token = localStorage.getItem('userAccessToken');
-          if (user && token) {
+          if (user && token && get().checkTokenValidity()) {
             set({ user, isAuthenticated: true, isLoading: false });
           } else {
-            set({ user: null, isAuthenticated: false, isLoading: false });
+            get().logout();
           }
         },
+        checkTokenValidity:()=>{
+          const token = localStorage.getItem('userAccessToken')
+          if(!token) return false
+          try {
+            const decodedToken: any = jwtDecode(token);
+            const currentTime = Date.now() / 1000;
+            return decodedToken.exp > currentTime;
+          } catch (error) {
+            console.error('Error decoding token:', error);
+            return false;
+          }
+        }
       }),
       {
         name: 'auth-storage',

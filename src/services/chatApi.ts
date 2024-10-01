@@ -36,6 +36,13 @@ export const saveAudio = async (chatId: string, senderId: string, fileUrl: strin
   return response.data
 }
 
+export const saveCall = async (chatId: string, senderId: string, call: boolean) => {
+  const response = await axios.post(`${BACKEND_URL}/chat/call`, {
+    chatId, senderId, call
+  })
+  return response.data
+}
+
 
 export const getUserChats = async (userId: string) => {
   const response = await axios.get(`${BACKEND_URL}/chat/chats/${userId}/getuserchats`)

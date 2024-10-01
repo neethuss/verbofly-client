@@ -8,6 +8,10 @@ import { useRouter } from "next/navigation";
 import AdminProtedctedRoute from "@/HOC/AdminProtectedRoute";
 import { categoryBlockUnblock, fetchCategories } from "@/services/categoryApi";
 import Modal from "@/components/Modal";
+import { CiEdit } from "react-icons/ci";
+import { CgUnblock } from "react-icons/cg";
+import { MdBlock } from "react-icons/md";
+import useAdminAuthStore from "@/store/adminAuthStore";
 
 interface Category {
   _id: string;
@@ -16,6 +20,7 @@ interface Category {
 }
 
 const page = () => {
+  const {token} = useAdminAuthStore()
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
   const [page, setPage] = useState<number>(1);
@@ -30,7 +35,6 @@ const page = () => {
   const router = useRouter();
 
   useEffect(() => {
-    let token = localStorage.getItem("adminAccessToken");
     const fetchCategoriesData = async () => {
       try {
         const data = await fetchCategories(
@@ -65,7 +69,6 @@ const page = () => {
     action: "block" | "unblock"
   ) => {
     console.log("update block, unblock");
-    const token = localStorage.getItem("adminAccessToken");
     const data = await categoryBlockUnblock(action, id, token as string);
     if (data) {
       setCategories((prevCategories) =>
@@ -107,7 +110,7 @@ const page = () => {
   };
 
   return (
-    <div className="flex flex-col min-h-screen">
+    <div className="flex flex-col min-h-screen font-sans">
       <AdminLayout>
         <div className="flex flex-col h-full">
           <div className="flex-grow overflow-hidden">
@@ -151,31 +154,26 @@ const page = () => {
                           category.categoryName.slice(1)}
                       </td>
                       <td className="px-4 py-2 text-white">
-                        <div className="flex justify-center">
-                          <button
-                            className="border rounded-3xl px-7 bg-blue-800 text-white hover:underline ml-2"
+                        <div className="flex justify-center gap-3">
+                          <CiEdit
+                            className=" text-blue-800 cursor-pointer"
                             onClick={() => handleEdit(category._id)}
-                          >
-                            Edit
-                          </button>
+                          />
+
                           {category.isBlocked ? (
-                            <button
-                              className="border rounded-3xl px-5 bg-green-600 text-white hover:underline ml-2"
+                            <CgUnblock
+                              className=" text-green-600 cursor-pointer"
                               onClick={() =>
                                 handleOpenModal(category._id, "unblock")
                               }
-                            >
-                              Unblock
-                            </button>
+                            />
                           ) : (
-                            <button
-                              className="border rounded-3xl px-5 bg-red-600 text-white hover:underline ml-2"
+                            <MdBlock
+                              className=" text-red-600 cursor-pointer"
                               onClick={() =>
-                                handleOpenModal(category._id, "unblock")
+                                handleOpenModal(category._id, "block")
                               }
-                            >
-                              Block
-                            </button>
+                            />
                           )}
                         </div>
                       </td>

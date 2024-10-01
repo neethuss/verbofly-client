@@ -9,6 +9,8 @@ import { fetchCategories } from '@/services/categoryApi';
 import ProtectedRoute from '@/HOC/ProtectedRoute'
 import useAuthStore from '@/store/authStore';
 import UserNav from '@/components/UserNav';
+import { fetchUser } from '@/services/userApi';
+import { User } from '@/Types/chat';
 
 interface Category {
   _id: string;
@@ -22,12 +24,44 @@ interface Language {
 }
 
 const CategoryPage = () => {
-  const { user } = useAuthStore();
+  const { user ,logout} = useAuthStore();
+  const [currentUser, setCurrentUser] = useState<User>()
   const [categories, setCategories] = useState<Category[]>([]);
   const [language, setLanguage] = useState<Language>();
   const [subscribed, setSubscribed] = useState(false)
   const router = useRouter();
   const { languageId } = useParams();
+
+  useEffect(() => {
+    const token = localStorage.getItem("userAccessToken");
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
+      try {
+        const data = await fetchUser(token as string);
+        setCurrentUser(data)
+        setSubscribed(data.isSubscribed);
+        
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, []);
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -50,10 +84,10 @@ const CategoryPage = () => {
       }
     };
 
-    setSubscribed(user.user.isSubscribed);
+    
 
     fetchData();
-  }, [languageId, router, user?.user?.isSubscribed]);
+  }, [languageId, router]);
 
   const getCategoryIcon = (categoryName: string) => {
     switch (categoryName.toLowerCase()) {

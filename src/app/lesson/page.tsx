@@ -8,26 +8,33 @@ import ProtectedRoute from "@/HOC/ProtectedRoute";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { checkBlock } from "@/services/userApi";
+import { useEffect, useState } from "react";
+import { checkBlock, fetchUser } from "@/services/userApi";
+import { User } from "@/Types/chat";
+import useAuthStore from "@/store/authStore";
 
 const Lesson: React.FC = () => {
   const router = useRouter();
+const {logout} = useAuthStore()
+  const [currentUser, setCurrentUser] = useState<User>()
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
-
-    const checking = async () => {
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
       try {
-        const check = await checkBlock(token as string);
-        console.log(check);
+        const data = await fetchUser(token as string);
+        setCurrentUser(data)
+        
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              localStorage.removeItem("userAccessToken");
-              router.push("/login");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
             }
           } else {
             toast.error("An unexpected error occurred in login");
@@ -37,9 +44,9 @@ const Lesson: React.FC = () => {
         }
       }
     };
-
-    checking();
+    fetchCurrentUser();
   }, []);
+
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen bg-gray-900 text-white font-sans">

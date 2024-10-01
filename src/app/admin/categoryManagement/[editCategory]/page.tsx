@@ -8,12 +8,13 @@ import { useParams, useRouter } from 'next/navigation'
 import AdminProtedctedRoute from '@/HOC/AdminProtectedRoute';
 import { CategoryErrors } from '@/utils/Types'
 import { categorySchema } from '@/utils/Validation'
+import useAdminAuthStore from '@/store/adminAuthStore'
 
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
 const page = () => {
-
+const {token, adminLogout} = useAdminAuthStore()
   const [categoryName, setCategoryName] = useState<string>('')
   const [errors, setErrors] = useState<CategoryErrors>({});
 
@@ -26,7 +27,7 @@ const page = () => {
       try {
         const response = await axios.get(`${BACKEND_URL}/category/${editCategory}`,{
           headers :{
-            Authorization:`Bearer ${localStorage.getItem('adminAccessToken')}`
+            Authorization:`Bearer ${token}`
           }
         })
         if(response.status === 200){
@@ -38,10 +39,8 @@ const page = () => {
           console.error(
             "Token expired or unauthorized. Redirecting to login..."
           );
-          localStorage.removeItem("adminAccessToken");
-          localStorage.removeItem("admin");
           toast.error("Token expired...Login again!");
-          router.push("/admin");
+          adminLogout()
         } else {
           console.error("Error fetching user data:", error);
         }
@@ -102,7 +101,7 @@ const page = () => {
 
   return (
     <AdminLayout>
-       <div className="min-h-screen flex flex-col">
+       <div className="min-h-screen flex flex-col font-sans">
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-4 w-full mt-5">
             <h1 className="text-3xl text-white">Edit Category</h1>

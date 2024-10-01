@@ -9,6 +9,7 @@ import AdminProtedctedRoute from "@/HOC/AdminProtectedRoute";
 import Select from "react-select";
 import { LanguageErrors } from "@/utils/Types";
 import { languageSchema } from "@/utils/Validation";
+import useAdminAuthStore from "@/store/adminAuthStore";
 
 ;
 
@@ -27,6 +28,7 @@ interface Language {
 }
 
 const Page = () => {
+  const {token, adminLogout} = useAdminAuthStore()
   const [language, setLanguage] = useState<Language | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
@@ -42,9 +44,7 @@ const Page = () => {
           `${BACKEND_URL}/language/${editLanguage}`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem(
-                "adminAccessToken"
-              )}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -61,9 +61,7 @@ const Page = () => {
           `${BACKEND_URL}/country/countries`,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem(
-                "adminAccessToken"
-              )}`,
+              Authorization: `Bearer ${token}`,
             },
           }
         );
@@ -125,7 +123,7 @@ const Page = () => {
         },
         {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem("adminAccessToken")}`,
+            Authorization: `Bearer ${token}`,
           },
         }
       );
@@ -155,7 +153,7 @@ const Page = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen flex flex-col">
+      <div className="min-h-screen flex flex-col font-sans">
         <div className="flex-grow">
           <div className="flex justify-between items-center mb-4 w-full mt-5">
             <h1 className="text-3xl text-white">Edit Language</h1>

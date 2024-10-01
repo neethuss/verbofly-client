@@ -2,14 +2,18 @@
 import { useEffect, useState } from "react";
 import { translateLanguage } from "../../services/lessonApi";
 import UserNav from "@/components/UserNav";
-import { checkBlock } from "@/services/userApi";
+import { checkBlock, fetchUser } from "@/services/userApi";
 import axios from "axios";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
 import { FaLanguage } from "react-icons/fa";
+import useAuthStore from "@/store/authStore";
+import { User } from "@/Types/chat";
 
 export default function TranslatePage() {
   const router = useRouter();
+  const {logout, isLoading} = useAuthStore()
+  const [currenctUser, setCurrenctUser] = useState<User>()
   const [text, setText] = useState("");
   const [translatedText, setTranslatedText] = useState("");
   const [sourceLanguage, setSourceLanguage] = useState("en");
@@ -41,18 +45,21 @@ export default function TranslatePage() {
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
-
-    const checking = async () => {
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
       try {
-        const check = await checkBlock(token as string);
-        console.log(check);
+        const data = await fetchUser(token as string);
+        setCurrenctUser(data)
+        
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              localStorage.removeItem("userAccessToken");
-              router.push("/login");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
             }
           } else {
             toast.error("An unexpected error occurred in login");
@@ -62,9 +69,10 @@ export default function TranslatePage() {
         }
       }
     };
-
-    checking();
+    fetchCurrentUser();
   }, []);
+
+
 
   return (
     <div className="flex min-h-screen bg-gray-900 text-white font-sans">

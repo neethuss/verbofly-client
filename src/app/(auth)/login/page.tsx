@@ -53,11 +53,7 @@ const LoginPage = () => {
       const data = await postLogin(email, password);
       if (data) {
         toast.success("Login successful!");
-        const expiresAt = new Date().getTime() + 24 * 60 * 60 * 1000;
-        localStorage.setItem("userAccessToken", data.accessToken);
-        localStorage.setItem("user", JSON.stringify(data.user.user));
-        localStorage.setItem("userExpiresAt", expiresAt.toString());
-        setUserAuth(data);
+        setUserAuth(data.user, data.accessToken);
         router.push("/dashboard");
       }
     } catch (error) {

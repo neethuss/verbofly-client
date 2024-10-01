@@ -9,6 +9,8 @@ import { fetchLesson } from '@/services/lessonApi';
 import { fetchUser, getUserProgress, updateProgress } from '@/services/userApi';
 import ProtectedRoute from '@/HOC/ProtectedRoute';
 import UserNav from '@/components/UserNav';
+import useAuthStore from '@/store/authStore';
+import { User } from '@/Types/chat';
 
 interface Lesson {
   _id: string;
@@ -19,10 +21,42 @@ interface Lesson {
 }
 
 const VideoLessonPage = () => {
+  const {logout} = useAuthStore()
+  const [currentUser,setCurrentUser] = useState<User>()
   const [lesson, setLesson] = useState<Lesson | null>(null);
   const [isCompleted, setIsCompleted] = useState(false);
   const { lessonId } = useParams();
   const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("userAccessToken");
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
+      try {
+        const data = await fetchUser(token as string);
+        setCurrentUser(data)
+        
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, []);
+
 
   useEffect(() => {
     const fetchLessonData = async () => {

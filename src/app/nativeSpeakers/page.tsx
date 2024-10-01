@@ -5,6 +5,7 @@ import {
   acceptConnectionRequest,
   cancelConnectionRequest,
   fetchNativeSpeakers,
+  fetchUser,
   sendConnectionRequest,
 } from "../../services/userApi";
 import Head from "next/head";
@@ -16,6 +17,8 @@ import { fetchCountries } from "../../services/countryApi";
 import ProtectedRoute from '@/HOC/ProtectedRoute';
 import useAuthStore from "@/store/authStore";
 import { FaSearch, FaUsers } from "react-icons/fa";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 interface Country {
   countryName: string;
@@ -41,8 +44,10 @@ interface User {
 }
 
 const Page = () => {
+  const {logout} = useAuthStore()
   const [users, setUsers] = useState<User[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
+  const [currentUser, setCurrenctUser] = useState<User>()
   const [buttonStates, setButtonStates] = useState<Record<string, { text: string; color: string }>>({});
   const [languages, setLanguages] = useState<Language[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
@@ -55,6 +60,35 @@ const Page = () => {
 
   const { user } = useAuthStore();
   const router = useRouter();
+  useEffect(() => {
+    const token = localStorage.getItem("userAccessToken");
+    const fetchCurrentUser = async () => {
+      console.log('useEffect in subscription')
+      try {
+        const data = await fetchUser(token as string);
+        setCurrenctUser(data)
+        
+      } catch (error) {
+        if (axios.isAxiosError(error)) {
+          if (error.response) {
+            if (error.response.status === 403) {
+              toast.error("User is blocked");
+              logout()
+            }else if (error.response.status === 401) {
+              toast.error("Token expired");
+              logout()
+            }
+          } else {
+            toast.error("An unexpected error occurred in login");
+          }
+        } else {
+          toast.error("An error occurred during login. Please try again.");
+        }
+      }
+    };
+    fetchCurrentUser();
+  }, []);
+
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");

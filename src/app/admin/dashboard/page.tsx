@@ -7,6 +7,7 @@ import { FaUsers } from "react-icons/fa6";
 import { RiUserStarLine } from "react-icons/ri";
 import { MdFeaturedPlayList } from "react-icons/md";
 import { fetchUsers } from "@/services/userApi";
+import useAdminAuthStore from "@/store/adminAuthStore";
 
 interface Country {
   countryName: string;
@@ -36,14 +37,13 @@ interface User {
 }
 
 const page = () => {
-  const [users, setUsers] = useState<User[]>([]);
+  const {token} = useAdminAuthStore()
   const [totalUsers, setTotalUsers] = useState(0);
   const [newUsers, setNewUsers] = useState(0);
   const [subscribedUsers, setSubscribedUsers] = useState(0);
   const [groupedUsers, setGroupedUsers] = useState<Record<string, { users: User[]; subscribedCount: number }>>({});
 
   useEffect(() => {
-    const token = localStorage.getItem("adminAccessToken");
     const fetchUsersData = async () => {
       try {
         const data = await fetchUsers(token as string);
@@ -94,7 +94,7 @@ const page = () => {
 
   return (
     <AdminLayout>
-      <div className="min-h-screen bg-[#0f172a] p-4 sm:p-6 text-white">
+      <div className="min-h-screen bg-gray-900 p-4 sm:p-6 text-white font-sans">
         <div className="mb-6">
           <input
             type="text"
