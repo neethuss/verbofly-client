@@ -9,7 +9,7 @@ import { MdCall, MdCallEnd } from "react-icons/md";
 import { FaRegCircleUser } from "react-icons/fa6";
 
 const CallNotification = () => {
-  const { ongoingCall, handleJoinCall ,handleHangupDuringInitiation} = useSocketStore();
+  const { ongoingCall, handleJoinCall ,handleHangupDuringInitiation, handleHangup} = useSocketStore();
   useEffect(()=>{
 
   },[ongoingCall])
@@ -20,7 +20,6 @@ const CallNotification = () => {
     <div className="absolute bg-opacity-70 w-screen h-screen top-0 bottom-0 flex items-center justify-center text-black">
       <div className="bg-[#1b1b1b] min-w-[400px] min-h-[100px] flex flex-col items-center justify-center rounded-xl p-4">
         <div className="flex flex-col items-center">
-        <FaRegCircleUser className="text-9xl text-white"/>
         <Image
             src={ongoingCall.participants.caller.profilePhoto || ""}
             alt="/default-profile.jpg"

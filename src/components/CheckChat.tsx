@@ -80,7 +80,6 @@ const CheckChat: React.FC<CheckChatProps> = ({
         } else {
           console.error("Chat Id not found");
         }
-        console.log(messages, "messages");
       } catch (error) {
         console.error("Error fetching chat or messages:", error);
         setMessages([]);
@@ -88,7 +87,7 @@ const CheckChat: React.FC<CheckChatProps> = ({
     };
 
     fetchChat();
-  }, [currentUserId, otherUserId, messages, onMessagesRead, scrollToBottom]);
+  }, [currentUserId, otherUserId, onMessagesRead, scrollToBottom]);
 
   useEffect(() => {
     if (!socket) {
@@ -270,6 +269,7 @@ const CheckChat: React.FC<CheckChatProps> = ({
   const initiateVideoCall = async () => {
     if (socket && chatId) {
       const savedMessage = await saveCall(chatId, currentUserId, true);
+      console.log(savedMessage, 'savedMessage')
       const callMessageData = {
         chatId,
         senderId: currentUserId,

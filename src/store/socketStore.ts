@@ -83,7 +83,8 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
 
   handleCall: async (receiverUser) => {
     console.log('initialing call')
-    const callerUser = useAuthStore.getState().user.user
+    const callerUser = useAuthStore.getState().user
+    console.log(callerUser,'callerUser')
     const socket = get().socket
     if (!callerUser || !socket) return
 
@@ -287,8 +288,9 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
 
 
   initializeSocket: () => {
-    const user = useAuthStore.getState().user;
-    if (!user || !user.user || !user.user._id) {
+    const authStore = useAuthStore.getState();
+    const user = authStore.user;
+    if (!user || !user._id) {
       console.error('User is not properly authenticated');
       return;
     }
@@ -302,8 +304,8 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
 
     const onConnect = () => {
       set({ isSocketConnected: true })
-      console.log('user connected', user.user._id)
-      newSocket.emit('user_connected', user.user._id)
+      console.log('user connected', user._id)
+      newSocket.emit('user_connected', user._id)
 
     }
 

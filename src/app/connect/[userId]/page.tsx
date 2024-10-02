@@ -24,7 +24,8 @@ interface LastMessage {
   senderId: string;
   senderName: string | undefined;
   image: string;
-  audio: string;
+  audio:string
+  call:boolean
 }
 
 export interface User {
@@ -69,7 +70,6 @@ const ChatPage = () => {
   const { userId } = useParams();
 
   const router = useRouter();
-  const currentUserId = user?.user?._id;
   const { socket, initializeSocket, ongoingCall } = useSocketStore();
 
   const [chatUsers, setChatUsers] = useState<Chat[]>([]);
@@ -81,6 +81,7 @@ const ChatPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roomId, setRoomId] = useState("");
+  const currentUserId = user?._id
 
   useEffect(() => {
     console.log(currentUserId, "cuu");
@@ -125,6 +126,8 @@ const ChatPage = () => {
                     senderId: "",
                     senderName: "",
                     image: "",
+                    audio:"",
+                    call:false
                   },
                   otherUser: newChatUser.nativeUser,
                   unreadMessages: 0,
@@ -155,6 +158,7 @@ const ChatPage = () => {
                   senderName: "",
                   image: "",
                   audio: "",
+                  call:false
                 },
                 otherUser: newChatUser.nativeUser,
                 unreadMessages: 0,
@@ -249,7 +253,7 @@ const ChatPage = () => {
   return (
     <div className="flex h-screen bg-gray-900 text-white font-sans relative">
       <UserNav />
-      <main className="flex-1 flex flex-col p-8 overflow-hidden">
+      <main className="flex-1 flex flex-col p-8 overflow-hidden lg:ml-24">
         {ongoingCall && (
           <div className="absolute inset-0 z-50 ">
             <CallNotification />
@@ -284,6 +288,7 @@ const ChatPage = () => {
                     }`}
                     onClick={() => handleUserClick(chatUser.otherUser._id)}
                   >
+                    
                     <Image
                       className="w-10 h-10 rounded-full mr-3"
                       src={
@@ -291,10 +296,6 @@ const ChatPage = () => {
                         "/default-profile.jpg"
                       }
                       alt={chatUser.otherUser.username}
-                      width={40}
-                      height={40}
-                      objectFit="cover"
-                      placeholder="blur"
                     />
                     <div className="flex-1">
                       <div className="font-semibold">
@@ -308,7 +309,7 @@ const ChatPage = () => {
                             : chatUser.lastMessage.senderName}
                           : <span>📷 Photo</span>
                         </div>
-                      ) : chatUser.lastMessage.audio ? (
+                      ) : chatUser.lastMessage.audio ? ( 
                         <div className="text-sm opacity-75">
                           {chatUser.lastMessage.senderId === currentUserId
                             ? "Me"
@@ -321,6 +322,14 @@ const ChatPage = () => {
                             ? "Me"
                             : chatUser.lastMessage.senderName}
                           : {chatUser.lastMessage.messageText}
+                        </div>
+                      ) :
+                      chatUser.lastMessage.call ? (
+                        <div className="text-sm opacity-75">
+                          {chatUser.lastMessage.senderId === currentUserId
+                            ? "Me"
+                            : chatUser.lastMessage.senderName}
+                          :`Call`
                         </div>
                       ) : null}
                     </div>
@@ -370,9 +379,7 @@ const ChatPage = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-1/3">
             <form onSubmit={handleCreateGroup}>
-              <h2 className="text-2xl font-bold mb-4">
-                Enter a conference meeting
-              </h2>
+              <h2 className="text-2xl font-bold mb-4">Enter a conference meeting</h2>
               <input
                 type="text"
                 value={roomId}
