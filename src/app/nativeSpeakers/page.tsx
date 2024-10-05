@@ -171,7 +171,7 @@ const Page = () => {
     fetchUsersData();
     fetchLanguagesData();
     fetchCountriesData();
-  }, [searchQuery, filterCountry, filterLanguage, page, user.user._id, limit]);
+  }, [searchQuery, filterCountry, filterLanguage, page, user._id, limit]);
 
   const totalPages = Math.ceil(totalUsers / limit);
 
@@ -222,31 +222,31 @@ const Page = () => {
   };
 
   return (
-    <div className="flex min-h-screen bg-[#0f172a] text-white font-sans">
+    <div className="flex flex-col min-h-screen bg-[#0f172a] text-white font-sans">
       <Head>
         <title>TalkTrek - Find Native Speakers</title>
         <meta name="description" content="Find native speakers on TalkTrek" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <UserNav />
-      <main className="flex-1 p-8">
-        <h1 className="text-4xl font-bold mb-8 text-center">
+      <main className="flex-1 p-4 sm:p-6 lg:p-8 lg:ml-28">
+        <h1 className="text-3xl sm:text-4xl font-bold mb-6 sm:mb-8 text-center">
           Find Native Speakers
         </h1>
 
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <div className="col-span-3 md:col-span-1">
-              <div className="bg-[#1e293b] p-4 rounded-lg flex items-center h-32">
-                <FaUsers className="w-10 h-10 mr-4" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <div className="lg:col-span-1">
+              <div className="bg-[#1e293b] p-4 rounded-lg flex items-center h-full">
+                <FaUsers className="w-8 h-8 sm:w-10 sm:h-10 mr-4" />
                 <div>
-                  <p className="text-lg font-semibold">Total Native Speakers</p>
-                  <p className="text-2xl font-bold">{totalUsers}</p>
+                  <p className="text-base sm:text-lg font-semibold">Total Native Speakers</p>
+                  <p className="text-xl sm:text-2xl font-bold">{totalUsers}</p>
                 </div>
               </div>
             </div>
-            <div className="col-span-3 md:col-span-2">
-              <div className="bg-[#1e293b] p-4 rounded-lg h-32 flex flex-col justify-between">
+            <div className="lg:col-span-2">
+              <div className="bg-[#1e293b] p-4 rounded-lg h-full flex flex-col justify-between">
                 <div className="flex items-center mb-4">
                   <FaSearch className="mr-2" />
                   <input
@@ -257,11 +257,11 @@ const Page = () => {
                     onChange={(e) => setSearchQuery(e.target.value)}
                   />
                 </div>
-                <div className="flex gap-4">
+                <div className="flex flex-col sm:flex-row gap-4">
                   <select
                     value={filterCountry}
                     onChange={(e) => setFilterCountry(e.target.value)}
-                    className="w-1/2 p-2 rounded-lg bg-[#2d3748] text-white"
+                    className="w-full sm:w-1/2 p-2 rounded-lg bg-[#2d3748] text-white"
                   >
                     <option value="">Select Country</option>
                     {countries.map((country, index) => (
@@ -273,7 +273,7 @@ const Page = () => {
                   <select
                     value={filterLanguage}
                     onChange={(e) => setFilterLanguage(e.target.value)}
-                    className="w-1/2 p-2 rounded-lg bg-[#2d3748] text-white"
+                    className="w-full sm:w-1/2 p-2 rounded-lg bg-[#2d3748] text-white"
                   >
                     <option value="">Select Language</option>
                     {languages.map((language, index) => (
@@ -287,7 +287,7 @@ const Page = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+          <div className="flex flex-wrap justify-center gap-7 sm:gap-6 mb-6 sm:mb-8">
             {users.map((user) => {
               const { text: buttonText, color: buttonColor } = buttonStates[
                 user._id
@@ -299,9 +299,9 @@ const Page = () => {
               return (
                 <div
                   key={user._id}
-                  className="bg-[#1e293b] rounded-lg overflow-hidden shadow-lg"
+                  className="bg-[#1e293b] rounded-lg overflow-hidden shadow-lg flex flex-col w-full sm:w-[calc(50%-12px)] lg:w-[calc(25%-18px)] max-w-sm"
                 >
-                  <div className="h-48 overflow-hidden">
+                  <div className="h-40 sm:h-48 overflow-hidden">
                     <Image
                       src={user.profilePhoto || BlankProfile.src}
                       alt={`${user.username}'s profile`}
@@ -311,31 +311,33 @@ const Page = () => {
                       objectFit="cover"
                     />
                   </div>
-                  <div className="p-6">
-                    <h2 className="text-xl font-semibold mb-2">
-                      {user.username.charAt(0).toUpperCase() +
-                        user.username.slice(1)}
-                    </h2>
-                    {user?.country?.countryName && (
-                      <p className="text-gray-300 mb-1">
-                        Country: {user.country.countryName}
-                      </p>
-                    )}
-                    {user?.nativeLanguage?.languageName && (
-                      <p className="text-gray-300 mb-4">
-                        Native Language: {user.nativeLanguage.languageName}
-                      </p>
-                    )}
-                    <div className="flex justify-between items-center">
+                  <div className="p-4 sm:p-6 flex-grow flex flex-col justify-between">
+                    <div>
+                      <h2 className="text-lg sm:text-xl font-semibold mb-2">
+                        {user.username.charAt(0).toUpperCase() +
+                          user.username.slice(1)}
+                      </h2>
+                      {user?.country?.countryName && (
+                        <p className="text-sm sm:text-base text-gray-300 mb-1">
+                          Country: {user.country.countryName}
+                        </p>
+                      )}
+                      {user?.nativeLanguage?.languageName && (
+                        <p className="text-sm sm:text-base text-gray-300 mb-4">
+                          Native Language: {user.nativeLanguage.languageName}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-4">
                       <button
                         onClick={() => handleClick(buttonText, user._id)}
-                        className={`font-bold text-center uppercase transition-all text-xs py-2 px-4 rounded-lg ${buttonColor}`}
+                        className={`font-bold text-center uppercase transition-all text-xs py-2 px-4 rounded-lg mb-2 sm:mb-0 ${buttonColor}`}
                       >
                         {buttonText}
                       </button>
                       <button
                         onClick={() => handleNativeView(user._id)}
-                        className="text-yellow-400 hover:text-yellow-500 underline"
+                        className="text-yellow-400 hover:text-yellow-500 underline text-sm"
                       >
                         View Profile
                       </button>
@@ -347,19 +349,19 @@ const Page = () => {
           </div>
 
           <div className="flex justify-center">
-            <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2 sm:space-x-4">
               <button
-                className="px-4 py-2 bg-[#1e293b] rounded-md disabled:opacity-50"
+                className="px-3 py-1 sm:px-4 sm:py-2 bg-[#1e293b] rounded-md disabled:opacity-50 text-sm sm:text-base"
                 onClick={() => setPage(page - 1)}
                 disabled={page === 1}
               >
                 Previous
               </button>
-              <span>
+              <span className="text-sm sm:text-base">
                 Page {page} of {totalPages}
               </span>
               <button
-                className="px-4 py-2 bg-[#1e293b] rounded-md disabled:opacity-50"
+                className="px-3 py-1 sm:px-4 sm:py-2 bg-[#1e293b] rounded-md disabled:opacity-50 text-sm sm:text-base"
                 onClick={() => setPage(page + 1)}
                 disabled={page === totalPages}
               >

@@ -69,7 +69,8 @@ const CategoryPage = () => {
         const token = localStorage.getItem("userAccessToken")
         const data = await fetchCategories(token as string)
         if(data){
-          setCategories(data.categories)
+          const categories = data.categories.filter((category:Category)=>!category.isBlocked)
+          setCategories(categories)
         }
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {

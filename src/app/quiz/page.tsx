@@ -10,7 +10,7 @@ import { toast, ToastContainer } from "react-toastify";
 import { checkBlock, fetchUser } from "@/services/userApi";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-import { User } from "@/Types/chat";
+import { Language, User } from "@/Types/chat";
 import useAuthStore from "@/store/authStore";
 
 interface ICountry {
@@ -65,7 +65,8 @@ const Quiz: React.FC = () => {
     const token = localStorage.getItem("userAccessToken");
     const fetchLanguagesData = async () => {
       const data = await fetchLanguages(token as string);
-      setLanguages(data.languages);
+      const languages = data.languages.filter((language:Language)=>!language.isBlocked)
+      setLanguages(languages);
     };
     fetchLanguagesData()
   },[]);

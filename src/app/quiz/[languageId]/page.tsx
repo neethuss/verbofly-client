@@ -17,6 +17,7 @@ import { toast } from "react-toastify";
 interface ICategory {
   _id: string;
   categoryName: string;
+  isBlocked:boolean
 }
 
 interface ILanguage {
@@ -75,7 +76,7 @@ const QuizLanguagePage = () => {
 
     const fetchCategoriesData = async () => {
       const data = await fetchCategories(token as string);
-      console.log(data,'categod')
+     const categories = data.categories.filter((category:ICategory)=> !category.isBlocked)
       setCategories(data.categories);
     };
 

@@ -136,7 +136,8 @@ const EditProfile: React.FC = () => {
     const fetchCountriesData = async () => {
       try {
         const data = await fetchCountries(token as string);
-        setCountries(data.countries || []);
+        const countries = data.countries.filter((country:Country)=>!country.isBlocked)
+        setCountries(countries || []);
       } catch (error) {
         console.error("Failed to fetch countries:", error);
       }
@@ -145,7 +146,8 @@ const EditProfile: React.FC = () => {
     const fetchLanguagesData = async () => {
       try {
         const data = await fetchLanguages(token as string);
-        setLanguages(data.languages || []);
+        const languages  = data.languages.filter((language:Language)=> !language.isBlocked)
+        setLanguages(languages || []);
       } catch (error) {
         console.error("Failed to fetch languages:", error);
       }

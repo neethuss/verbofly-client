@@ -35,7 +35,7 @@ const QuizPage = () => {
   const [timeLeft, setTimeLeft] = useState(questionTimeout);
   const [quizResult, setQuizResult] = useState<string>("");
 
-  const userId = user?.user?._id;
+  const userId = user?._id;
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");

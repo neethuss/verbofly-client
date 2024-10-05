@@ -59,7 +59,7 @@ const GroupChatPage: React.FC = () => {
         serverSecret,
         roomId as string,
         Date.now().toString(),
-        user?.user?.username || "Anonymous"
+        user?.username || "Anonymous"
       );
 
       const zpInstance = ZegoUIKitPrebuilt.create(kitToken);

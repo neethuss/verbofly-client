@@ -51,7 +51,8 @@ const Lesson: React.FC = () => {
     const fetchData = async () => {
       try {
         const languagesData = await fetchLanguages(token as string);
-        setLanguages(languagesData.languages || []);
+        const languages = languagesData.languages.filter((language:Language)=>!language.isBlocked)
+        setLanguages(languages || []);
         const userData = await fetchUser(token as string);
         setUser(userData);
       } catch (error) {

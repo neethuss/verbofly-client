@@ -29,6 +29,7 @@ interface Lesson {
   content: string;
   languageName: Language;
   categoryName: Category;
+  isBlocked:boolean
 }
 
 const LessonListPage = () => {
@@ -79,7 +80,8 @@ const LessonListPage = () => {
           languageId as string,
           categoryId as string
         );
-        setLessons(data);
+        const lessons = data.filter((lesson:Lesson)=>!lesson.isBlocked)
+        setLessons(lessons);
         if (data.length > 0) {
           setCategoryName(data[0].categoryName.categoryName);
         }

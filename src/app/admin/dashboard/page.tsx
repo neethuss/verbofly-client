@@ -80,7 +80,7 @@ const AdminDashboard = () => {
     users: User[]
   ): Record<string, { users: User[]; subscribedCount: number }> => {
     return users.reduce((acc, user) => {
-      const language = user.nativeLanguage.languageName;
+      const language = user.nativeLanguage?.languageName || "Unknown";
       if (!acc[language]) {
         acc[language] = { users: [], subscribedCount: 0 };
       }
@@ -146,9 +146,9 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(groupedUsers).map(([languageName, { users, subscribedCount }]) => (
+                {Object.entries(groupedUsers).map(([languageName, { users, subscribedCount }], index) => (
                   <tr key={languageName} className="border-t border-[#374151]">
-                    <td className="py-2 px-3 sm:py-3 sm:px-6">1</td>
+                    <td className="py-2 px-3 sm:py-3 sm:px-6">{index+1}</td>
                     <td className="py-2 px-3 sm:py-3 sm:px-6">{languageName}</td>
                     <td className="py-2 px-3 sm:py-3 sm:px-6">{users.length}</td>
                     <td className="py-2 px-3 sm:py-3 sm:px-6">{subscribedCount}</td>
