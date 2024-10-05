@@ -45,7 +45,7 @@ interface User {
 }
 
 const Page = () => {
-  const { logout } = useAuthStore();
+  const { user,logout } = useAuthStore();
   const [users, setUsers] = useState<User[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [currentUser, setCurrenctUser] = useState<User>();
@@ -61,7 +61,6 @@ const Page = () => {
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
 
-  const { user } = useAuthStore();
   const router = useRouter();
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
@@ -103,7 +102,7 @@ const Page = () => {
           filterCountry,
           filterLanguage
         );
-        const userId = user.user._id;
+        const userId = user._id;
         setUserId(userId);
         if (data) {
           setUsers(data.users);
