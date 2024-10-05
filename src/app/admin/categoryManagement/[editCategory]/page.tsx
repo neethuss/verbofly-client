@@ -120,7 +120,7 @@ const {token, adminLogout} = useAdminAuthStore()
                 <h1 className="text-3xl mb-4 text-white">Edit Category</h1>
                 <input
                   type="text"
-                  placeholder="Enter country name"
+                  placeholder="Enter category name"
                   value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
                   className="mb-4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"

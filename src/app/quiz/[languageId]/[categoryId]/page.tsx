@@ -141,7 +141,7 @@ const QuizPage = () => {
           <h1 className="text-5xl font-extrabold mb-8 text-yellow-400">
             Quiz Completed!
           </h1>
-          <div className="bg-gray-800 py-8 px-4 rounded-md shadow-md mb-8">
+          <div className=" py-8 px-4 rounded-md shadow-md mb-8">
             <h2 className="text-3xl font-semibold text-gray-300">Your Score</h2>
             <div className="text-7xl font-extrabold text-teal-500 mt-4">
               {score} / {questions.length}

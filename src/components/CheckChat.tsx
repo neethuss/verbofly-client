@@ -52,14 +52,6 @@ const CheckChat: React.FC<CheckChatProps> = ({
     }
   }, [initializeSocket, socket]);
 
-  const scrollToBottom = useCallback(() => {
-    if (chatContainerRef.current) {
-      const scrollHeight = chatContainerRef.current.scrollHeight;
-      const height = chatContainerRef.current.clientHeight;
-      const maxScrollTop = scrollHeight - height;
-      chatContainerRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
-    }
-  }, []);
 
   useEffect(() => {
     const fetchChat = async () => {
@@ -73,7 +65,6 @@ const CheckChat: React.FC<CheckChatProps> = ({
             let afterMarkAsRead = await markAsRead(chat._id, otherUserId);
             setMessages(afterMarkAsRead);
             onMessagesRead(otherUserId);
-            setTimeout(scrollToBottom, 0);
           } else {
             setMessages([]);
           }
@@ -87,13 +78,8 @@ const CheckChat: React.FC<CheckChatProps> = ({
     };
 
     fetchChat();
-  }, [currentUserId, otherUserId, onMessagesRead, scrollToBottom]);
+  }, [currentUserId, otherUserId]);
 
-  useEffect(() => {
-    if (!socket) {
-      initializeSocket();
-    }
-  }, [initializeSocket, socket]);
 
   useEffect(() => {
     if (socket) {
@@ -235,9 +221,6 @@ const CheckChat: React.FC<CheckChatProps> = ({
     setFullScreenImage(null);
   };
 
-  useEffect(() => {
-    scrollToBottom();
-  }, [messages, scrollToBottom]);
 
   const startRecording = async () => {
     try {
@@ -303,6 +286,21 @@ const CheckChat: React.FC<CheckChatProps> = ({
       handleCall(otherUserDetails);
     }
   };
+
+
+  const scrollToBottom = useCallback(() => {
+    if (chatContainerRef.current) {
+      const scrollHeight = chatContainerRef.current.scrollHeight;
+      const height = chatContainerRef.current.clientHeight;
+      const maxScrollTop = scrollHeight - height;
+      chatContainerRef.current.scrollTop = maxScrollTop > 0 ? maxScrollTop : 0;
+    }
+  }, [chatContainerRef]);
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, scrollToBottom]);
+ 
 
   return (
     <div className="flex flex-col h-full relativ">

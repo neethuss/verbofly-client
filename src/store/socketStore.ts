@@ -84,7 +84,7 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
   handleCall: async (receiverUser) => {
     console.log('initialing call')
     const callerUser = useAuthStore.getState().user
-    console.log(callerUser,'callerUser')
+    console.log(callerUser, 'callerUser')
     const socket = get().socket
     if (!callerUser || !socket) return
 
@@ -136,9 +136,10 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
 
   handleCallCancelled: (message: string) => {
     console.log('Call cancelled:', message);
+    get().cleanupMediaStream()
     set({
       ongoingCall: null,
-      localStream:undefined
+      localStream: null
     });
   },
 

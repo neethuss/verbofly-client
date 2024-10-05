@@ -172,10 +172,10 @@ const LessonManagementPage = () => {
                       </td>
                       <td className="px-4 py-2 text-white">{lesson.content}</td>
                       <td className="px-4 py-2 text-white">
-                        {lesson.categoryName.categoryName}
+                        {lesson.categoryName.categoryName.charAt(0).toUpperCase() + lesson.categoryName.categoryName.slice(1)}
                       </td>
                       <td className="px-4 py-2 text-white">
-                        {lesson.languageName.languageName}
+                        {lesson.languageName.languageName.charAt(0).toUpperCase() + lesson.languageName.languageName.slice(1)}
                       </td>
                       <td className="px-4 py-2 text-white">
                       <div className="flex justify-center gap-3">

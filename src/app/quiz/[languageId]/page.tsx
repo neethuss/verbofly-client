@@ -42,6 +42,7 @@ const QuizLanguagePage = () => {
       try {
         const data = await fetchUser(token as string);
         setCurrentUser(data)
+        setSubscribed(data.isSubscribed)
         
       } catch (error) {
         if (axios.isAxiosError(error)) {
@@ -80,9 +81,7 @@ const QuizLanguagePage = () => {
 
     fetchLanguageDataById()
     fetchCategoriesData();
-    console.log(user,'user')
-    setSubscribed(user.user.isSubscribed);
-  },[languageId, router, user.user.isSubscribed, user]);
+  },[languageId, router]);
 
   const handleCategoryClick = (categoryId: string, categoryName: string) => {
     if (categoryName.toLowerCase() === 'beginner' || subscribed) {

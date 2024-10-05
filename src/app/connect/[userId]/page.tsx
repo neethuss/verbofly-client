@@ -295,6 +295,8 @@ const ChatPage = () => {
                         chatUser.otherUser.profilePhoto ||
                         "/default-profile.jpg"
                       }
+                      width={40}
+                      height={40}
                       alt={chatUser.otherUser.username}
                     />
                     <div className="flex-1">
