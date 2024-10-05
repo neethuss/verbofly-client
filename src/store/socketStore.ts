@@ -5,6 +5,8 @@ import useAuthStore from './authStore'
 import { OngoingCall, Participants, PeerData, User } from '@/Types/chat'
 import Peer, { SignalData } from 'simple-peer'
 
+const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
 interface iSocketState {
   socket: Socket | null
   isSocketConnected: boolean
@@ -296,7 +298,7 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
       return;
     }
 
-    const newSocket = io("http://localhost:3002")
+    const newSocket = io(`${BACKEND_URL}`)
     console.log('connecting')
     set({ socket: newSocket })
 
