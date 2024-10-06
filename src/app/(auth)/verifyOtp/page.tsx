@@ -10,37 +10,62 @@ export default function OTPVerificationPage() {
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""])
   const [timeLeft, setTimeLeft] = useState(60)
   const [isTimerRunning, setIsTimerRunning] = useState(true)
-  const [timerKey, setTimerKey] = useState(0)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
   const router = useRouter()
+  const timerRef = useRef<NodeJS.Timeout | null>(null)
+
+  const startTimer = (duration: number) => {
+    if (timerRef.current) {
+      clearInterval(timerRef.current)
+    }
+
+    const endTime = Date.now() + duration * 1000
+    localStorage.setItem("otpTimerEnd", endTime.toString())
+
+    const updateTimer = () => {
+      const now = Date.now()
+      const remainingTime = Math.max(Math.floor((endTime - now) / 1000), 0)
+      setTimeLeft(remainingTime)
+      
+      if (remainingTime === 0) {
+        setIsTimerRunning(false)
+        localStorage.removeItem("otpTimerEnd")
+        if (timerRef.current) {
+          clearInterval(timerRef.current)
+        }
+      }
+    }
+
+    updateTimer()
+    timerRef.current = setInterval(updateTimer, 1000)
+  }
 
   useEffect(() => {
     if (inputRefs.current[0]) {
       inputRefs.current[0]?.focus()
     }
 
-    const storedStartTime = localStorage.getItem("otpTimerStart")
-    const startTime = storedStartTime ? parseInt(storedStartTime) : Date.now()
-
-    if (!storedStartTime) {
-      localStorage.setItem("otpTimerStart", startTime.toString())
+    const storedEndTime = localStorage.getItem("otpTimerEnd")
+    if (storedEndTime) {
+      const remainingTime = Math.max(Math.floor((parseInt(storedEndTime) - Date.now()) / 1000), 0)
+      if (remainingTime > 0) {
+        setTimeLeft(remainingTime)
+        setIsTimerRunning(true)
+        startTimer(remainingTime)
+      } else {
+        setIsTimerRunning(false)
+        localStorage.removeItem("otpTimerEnd")
+      }
+    } else {
+      startTimer(60)
     }
 
-    const updateTimer = () => {
-      const elapsedTime = Math.floor((Date.now() - startTime) / 1000)
-      const remainingTime = Math.max(60 - elapsedTime, 0)
-      setTimeLeft(remainingTime)
-
-      if (remainingTime === 0) {
-        setIsTimerRunning(false)
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current)
       }
     }
-
-    updateTimer()
-    const timer = setInterval(updateTimer, 1000)
-
-    return () => clearInterval(timer)
-  }, [timerKey])
+  }, [])
 
   const handleChange = (element: HTMLInputElement, index: number) => {
     if (isNaN(Number(element.value))) return
@@ -69,7 +94,7 @@ export default function OTPVerificationPage() {
         console.log("Verification completed", data)
         toast.success("OTP verified successfully")
         localStorage.removeItem("otp")
-        localStorage.removeItem("otpTimerStart")
+        localStorage.removeItem("otpTimerEnd")
         router.push("/resetPassword")
       }
     } catch (error) {
@@ -90,10 +115,10 @@ export default function OTPVerificationPage() {
       if (data) {
         toast.info("New OTP sent to your email")
         localStorage.setItem("otp", data.otp)
-        localStorage.setItem("otpTimerStart", Date.now().toString())
-        setTimeLeft(60)
+        setOtp(["", "", "", "", "", ""]) 
         setIsTimerRunning(true)
-        setTimerKey(prevKey => prevKey + 1)
+        startTimer(60)  
+        inputRefs.current[0]?.focus()  
       }
     } catch (error) {
       toast.error("Failed to resend OTP. Please try again.")
