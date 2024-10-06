@@ -1,66 +1,92 @@
-"use client"
+'use client'
 
-import React from 'react'
-import { useState, FormEvent, ChangeEvent } from 'react';
-import { useRouter } from 'next/navigation';
-import { toast, ToastContainer } from "react-toastify";
-import { sendForgotPasswordEmail } from '@/services/userApi';
+import React, { useState, FormEvent, ChangeEvent } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { toast, ToastContainer } from 'react-toastify'
+import { FaEnvelope, FaPaperPlane } from 'react-icons/fa'
+import { sendForgotPasswordEmail } from '@/services/userApi'
 
-const ForgotPasswordPage = () => {
-  const [email, setEmail] = useState('');
-
+export default function ForgotPasswordPage() {
+  const [email, setEmail] = useState('')
+  const [errors, setErrors] = useState<{ email?: string }>({})
   const router = useRouter()
 
-  const handleChange = (e : ChangeEvent<HTMLInputElement>) => {
-    const {name, value} = e.target
-    if(name === "email"){
-      setEmail(value)
+  const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value)
+    setErrors({})
+  }
+
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    
+    if (!email) {
+      setErrors({ email: 'Email is required' })
+      return
+    }
+
+    try {
+      const data = await sendForgotPasswordEmail(email)
+      if (data) {
+        localStorage.setItem('email', data.email)
+        localStorage.setItem('otp', data.otp)
+        toast.success('OTP sent successfully!')
+        router.push('/verifyOtp')
+      }
+    } catch (error) {
+      toast.error('An error occurred. Please try again.')
     }
   }
 
-  const handleSubmit = async(e : FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-      const data = await sendForgotPasswordEmail(email)
-       if(data){
-        console.log(data.otp,'otp undo')
-        localStorage.setItem('email',data.email)
-        localStorage.setItem('otp',data.otp)
-        router.push('/verifyOtp')
-    
-      }
-    
-  };
-
   return (
-    <div className="bg-login-bg bg-cover min-h-screen flex items-center justify-center ">
-      <div className="border border-white/30 p-8 rounded-lg w-full max-w-md">
-        <h1 className="text-3xl font-bold text-white text-center mb-4">
-          FORGOT YOUR PASSWORD?
-        </h1>
-        <h2 className="text-xl text-white/80 text-center mb-8">
-          ENTER YOUR EMAIL TO SEND OTP
-        </h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="email"
-            name="email"
-            value={email}
-            onChange={handleChange}
-            placeholder="Enter your email"
-            className="w-full bg-transparent border border-white/30 rounded px-4 py-2 text-white mb-6 focus:outline-none focus:border-white"
-            required
-          />
-          
-          <div className='flex justify-center'>
-          <button
-            type="submit"
-            className=" bg-white text-dark-blue font-bold py-2 px-4 rounded hover:bg-white/90 transition duration-300"
+    <div className="min-h-screen bg-gray-900 text-white font-sans flex items-center justify-center p-4 sm:p-6 lg:p-8">
+      <div className="w-full max-w-md">
+        <div className="text-center mb-8">
+          <h1 className="text-2xl sm:text-3xl font-bold text-yellow-400">VerboFly</h1>
+          <p className="mt-2 text-lg sm:text-xl">Forgot Your Password?</p>
+        </div>
+
+        <div className="bg-gray-800 rounded-lg p-6 sm:p-8">
+          <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+            <div>
+              <div className="relative">
+                <FaEnvelope className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={handleChange}
+                  className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                  required
+                />
+              </div>
+              {errors.email && (
+                <p className="mt-1 text-red-500 text-xs sm:text-sm">{errors.email}</p>
+              )}
+            </div>
+
+            <div>
+              <button
+                type="submit"
+                className="w-full flex justify-center items-center py-2 px-4 border border-transparent rounded-lg text-white bg-yellow-400 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500"
+              >
+                <FaPaperPlane className="mr-2" />
+                Send OTP
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <p className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-400">
+          Remember your password?{" "}
+          <Link
+            href="/login"
+            className="font-medium text-yellow-400 hover:text-yellow-500"
           >
-            SEND OTP
-          </button>
-          </div>
-          
-        </form>
+            Sign in
+          </Link>
+        </p>
       </div>
       <ToastContainer
         position="top-center"
@@ -75,7 +101,5 @@ const ForgotPasswordPage = () => {
         theme="dark"
       />
     </div>
-  );
+  )
 }
-
-export default ForgotPasswordPage

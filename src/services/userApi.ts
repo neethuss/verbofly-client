@@ -97,6 +97,7 @@ export const verifyOtp = async (otpString: string, storedOtp: string) => {
   }
 };
 
+
 // Resetting password
 export const resetPassword = async (email: string, password: string) => {
   try {
