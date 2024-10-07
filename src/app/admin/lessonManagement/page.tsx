@@ -168,7 +168,7 @@ const LessonManagementPage = () => {
                       key={lesson._id}
                       className="border-b border-gray-500 text-center"
                     >
-                      <td className="px-4 py-2 text-white">{lesson.title}</td>
+                      <td className="px-4 py-2 text-white">{lesson.title.charAt(0).toUpperCase() + lesson.title.slice(1)}</td>
                       <td className="px-4 py-2 text-white">
                         {lesson.description}
                       </td>
