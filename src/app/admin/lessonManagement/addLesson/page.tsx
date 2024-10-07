@@ -14,6 +14,7 @@ import { fetchCategories } from "@/services/categoryApi";
 import { addLesson } from "@/services/lessonApi";
 import { X } from "lucide-react";
 import useAdminAuthStore from "@/store/adminAuthStore";
+import LoadingPage from "@/components/Loading";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -46,6 +47,7 @@ const AddLessonPage = () => {
   const [categories, setCategories] = useState<Category[]>([]);
   const [errors, setErrors] = useState<LessonErrors>({});
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
+  const [loadingAddLesson, setLoadingAddLesson] = useState<boolean>(false)
 
   const router = useRouter();
 
@@ -138,6 +140,7 @@ const AddLessonPage = () => {
     formData.append("categoryName", category?.value || "");
 
     try {
+      setLoadingAddLesson(true)
       const response = await addLesson(token as string, formData);
       if (response.status === 201) {
         toast.success("Lesson added successfully!");
@@ -152,8 +155,14 @@ const AddLessonPage = () => {
       } else {
         console.error("Error adding lesson:", error);
       }
+    }finally{
+      setLoadingAddLesson(false)
     }
   };
+
+  if(loadingAddLesson){
+    return <LoadingPage/>
+  }
 
   return (
     <AdminLayout>

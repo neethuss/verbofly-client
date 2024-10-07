@@ -31,6 +31,7 @@ interface Lesson {
   languageName: Language;
   categoryName: Category;
   isBlocked: boolean;
+  createdAt:Date
 }
 
 const LessonManagementPage = () => {
@@ -58,7 +59,8 @@ const LessonManagementPage = () => {
           limit
         );
         if (data) {
-          setLessons(data.lessons);
+          const lessons = data.lessons.sort((a:Lesson,b:Lesson)=>new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          setLessons(lessons);
           setTotalLessons(data.total);
         }
       } catch (error) {

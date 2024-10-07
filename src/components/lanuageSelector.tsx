@@ -40,6 +40,7 @@ const Lesson: React.FC = () => {
   const [selectedLanguage, setSelectedlanguage] = useState<Language | null>(
     null
   );
+  const [loadingLanguages, setLoadingLanguages] = useState<boolean>(false)
   const { isAuthenticated, setUser, logout, isLoading } = useAuthStore();
   const router = useRouter();
 
@@ -50,6 +51,7 @@ const Lesson: React.FC = () => {
 
     const fetchData = async () => {
       try {
+        setLoadingLanguages(true)
         const languagesData = await fetchLanguages(token as string);
         const languages = languagesData.languages.filter((language:Language)=>!language.isBlocked)
         setLanguages(languages || []);
@@ -63,6 +65,8 @@ const Lesson: React.FC = () => {
           }
         }
         console.error("Error fetching data:", error);
+      }finally{
+        setLoadingLanguages(false)
       }
     };
 
@@ -78,7 +82,7 @@ const Lesson: React.FC = () => {
     setShowModal(false);
   };
 
-  if (isLoading) {
+  if (isLoading || loadingLanguages) {
     return <LoadingPage />;
   }
 

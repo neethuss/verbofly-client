@@ -177,7 +177,7 @@ const LessonListPage = () => {
                 <div className="flex items-center mb-3 sm:mb-4">
                   <FaBookOpen className="text-yellow-400 text-xl sm:text-2xl mr-2" />
                   <h3 className="text-lg sm:text-xl font-semibold">
-                    {lesson.title}
+                    {lesson.title.charAt(0).toUpperCase() + lesson.title.slice(1)}
                   </h3>
                 </div>
                 <p className="text-gray-300 mb-4 flex-grow text-sm sm:text-base">
