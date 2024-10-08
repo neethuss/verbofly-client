@@ -178,7 +178,7 @@ const EditLanguagePage = () => {
                 <input
                   type="text"
                   placeholder="Enter language name"
-                  value={language?.languageName? language.languageName.charAt(0).toUpperCase()+ language.languageName.slice(1) :"Enter language name" }
+                  value={language?.languageName}
                   onChange={(e) => setLanguage(prevLanguage => 
                     prevLanguage 
                       ? { ...prevLanguage, languageName: e.target.value }

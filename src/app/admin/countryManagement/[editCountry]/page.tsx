@@ -112,7 +112,7 @@ const {token, adminLogout} = useAdminAuthStore()
                 <input
                   type="text"
                   placeholder="Enter country name"
-                  value={countryName? countryName.charAt(0).toUpperCase() + countryName.slice(1) : "Enter country name"}
+                  value={countryName}
                   onChange={(e) => setCountryName(e.target.value)}
                   className="mb-4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
                 />

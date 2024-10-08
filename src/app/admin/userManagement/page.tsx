@@ -155,10 +155,10 @@ const Page = () => {
                       {user?.nativeLanguage?.languageName? user.nativeLanguage.languageName.charAt(0).toUpperCase() + user.nativeLanguage.languageName.slice(1) :"N/A"}
                     </td>
                     <td className="px-4 py-2 text-white">
-                      {user.knownLanguages? user.knownLanguages.map((language) => language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1)).join(", ") : "N/A"}
+                      {user.knownLanguages && user.knownLanguages.length>0 ? user.knownLanguages.map((language) => language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1)).join(", ") : "N/A"}
                     </td>
                     <td className="px-4 py-2 text-white">
-                      {user.languagesToLearn? user.languagesToLearn.map((language) => language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1)).join(", ") : "N/A"}
+                      {user.languagesToLearn && user.languagesToLearn.length>0 ? user.languagesToLearn.map((language) => language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1)).join(", ") : "N/A"}
                     </td>
                     <td className="px-4 py-2 text-white">
                       {user.isBlocked ? (

@@ -121,7 +121,7 @@ const {token, adminLogout} = useAdminAuthStore()
                 <input
                   type="text"
                   placeholder="Enter category name"
-                  value={categoryName? categoryName.charAt(0).toUpperCase() + categoryName.slice(1) : "Enter category name"}
+                  value={categoryName}
                   onChange={(e) => setCategoryName(e.target.value)}
                   className="mb-4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500"
                 />
