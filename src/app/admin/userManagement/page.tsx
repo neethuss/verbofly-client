@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react";
+import React, { use, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -10,6 +10,7 @@ import { fetchUsers, userBlockUnblock } from "@/services/userApi";
 import Modal from "@/components/Modal";
 import { CgUnblock } from "react-icons/cg";
 import { MdBlock } from "react-icons/md";
+import LoadingPage from "@/components/Loading";
 
 interface Country {
   id: string;
@@ -45,6 +46,7 @@ const Page = () => {
   const [showModal, setShowModal] = React.useState(false);
   const [currentUserId, setCurrentUserId] = React.useState<string>("");
   const [currentAction, setCurrentAction] = React.useState<"block" | "unblock">("block");
+  const [loadingUsers, setLoadingUsers] = useState<boolean>(false)
 
   const router = useRouter();
 
@@ -53,6 +55,7 @@ const Page = () => {
     const token = localStorage.getItem("adminAccessToken");
     const fetchUsersData = async () => {
       try {
+        setLoadingUsers(true)
         const data = await fetchUsers(token as string, searchCharacters, page, limit);
         if (data) {
           setUsers(data.users);
@@ -68,6 +71,8 @@ const Page = () => {
         } else {
           console.error("Error fetching users data:", error);
         }
+      }finally{
+        setLoadingUsers(false)
       }
     };
     fetchUsersData();
@@ -105,6 +110,10 @@ const Page = () => {
     setShowModal(false);
   };
 
+  if(loadingUsers){
+    return <LoadingPage/>
+  }
+
   return (
     <AdminLayout>
       <div className="min-h-screen flex flex-col p-4 font-sans">
@@ -137,23 +146,19 @@ const Page = () => {
               <tbody>
                 {users.map((user) => (
                   <tr key={user._id} className="border-b border-gray-500 text-center">
-                    <td className="px-4 py-2 text-white">{user.username}</td>
+                    <td className="px-4 py-2 text-white">{user.username.charAt(0).toUpperCase() + user.username.slice(1)}</td>
                     <td className="px-4 py-2 text-white">{user.email}</td>
                     <td className="px-4 py-2 text-white">
-                      {user?.country?.countryName || "N/A"}
+                      {user?.country?.countryName? user.country.countryName.charAt(0).toUpperCase() + user.country.countryName.slice(1) : "N/A"}
                     </td>
                     <td className="px-4 py-2 text-white">
-                      {user?.nativeLanguage?.languageName || "N/A"}
+                      {user?.nativeLanguage?.languageName? user.nativeLanguage.languageName.charAt(0).toUpperCase() + user.nativeLanguage.languageName.slice(1) :"N/A"}
                     </td>
                     <td className="px-4 py-2 text-white">
-                      {user.knownLanguages
-                        ?.map((language) => language.languageName)
-                        .join(", ") || "N/A"}
+                      {user.knownLanguages? user.knownLanguages.map((language) => language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1)).join(", ") : "N/A"}
                     </td>
                     <td className="px-4 py-2 text-white">
-                      {user.languagesToLearn
-                        ?.map((language) => language.languageName)
-                        .join(", ") || "N/A"}
+                      {user.languagesToLearn? user.languagesToLearn.map((language) => language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1)).join(", ") : "N/A"}
                     </td>
                     <td className="px-4 py-2 text-white">
                       {user.isBlocked ? (

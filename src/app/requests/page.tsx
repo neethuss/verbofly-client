@@ -11,6 +11,7 @@ import { FaUser } from "react-icons/fa";
 import { IoMdGlobe } from "react-icons/io";
 import { MdLanguage } from "react-icons/md";
 import axios from "axios";
+import LoadingPage from "@/components/Loading";
 
 interface Country {
   countryName: string;
@@ -42,6 +43,7 @@ const IncomingRequestsPage = () => {
   >({});
   const router = useRouter();
   const { setUser ,logout} = useAuthStore();
+  const [loadingRequests, setLoadingRequests] = useState<boolean>(false)
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
@@ -55,6 +57,7 @@ const IncomingRequestsPage = () => {
 
     const fetchData = async () => {
       try {
+        setLoadingRequests(true)
         const data = await fetchUser(token);
         setCurrentUser(data);
       
@@ -108,6 +111,8 @@ const IncomingRequestsPage = () => {
         } else {
           toast.error("An error occurred during login. Please try again.");
         }
+      }finally{
+        setLoadingRequests(false)
       }
     };
 
@@ -142,6 +147,10 @@ const IncomingRequestsPage = () => {
     }
   };
 
+  if(loadingRequests){
+    return <LoadingPage/>
+  }
+
   return (
     <div className="flex flex-col md:flex-row h-screen bg-gray-900 text-white font-sans lg:ml-24">
       <UserNav/>
@@ -162,12 +171,12 @@ const IncomingRequestsPage = () => {
                       <FaUser className="text-yellow-400 text-xl" />
                     </div>
                     <div>
-                      <p className="text-xl font-semibold text-yellow-400">{request.username}</p>
+                      <p className="text-xl font-semibold text-yellow-400">{request.username.charAt(0).toUpperCase() + request.username.slice(1)}</p>
                       <p className="text-sm text-gray-300 flex items-center">
-                        <IoMdGlobe className="mr-1" /> {request?.country?.countryName}
+                        <IoMdGlobe className="mr-1" /> {request?.country? request.country.countryName.charAt(0).toUpperCase() + request.country.countryName.slice(1) : 'Country not available'}
                       </p>
                       <p className="text-sm text-gray-300 flex items-center">
-                        <MdLanguage className="mr-1" /> {request?.nativeLanguage?.languageName}
+                        <MdLanguage className="mr-1" /> {request?.nativeLanguage? request.nativeLanguage.languageName.charAt(0).toUpperCase() + request.nativeLanguage.languageName.slice(1) : 'Native language not available'}
                       </p>
                     </div>
                   </div>

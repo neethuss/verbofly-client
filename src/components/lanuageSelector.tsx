@@ -96,7 +96,7 @@ const Lesson: React.FC = () => {
       {languages.map((language) => (
         <div key={language._id} className="bg-gray-800 rounded-lg p-6 flex flex-col items-center shadow-lg transition duration-300 transform hover:-translate-y-1 hover:shadow-2xl">
           <FaLanguage className="text-yellow-400 text-4xl mb-4" />
-          <h2 className="text-2xl font-bold mb-2">{language.languageName}</h2>
+          <h2 className="text-2xl font-bold mb-2">{language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1)}</h2>
           <p
             className="text-center mb-4 hover:underline decoration-yellow-400 cursor-pointer"
             onClick={() => handleOpenModal(language)}

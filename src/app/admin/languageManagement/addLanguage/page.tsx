@@ -11,6 +11,7 @@ import { LanguageErrors } from "@/utils/Types";
 import { languageSchema } from "@/utils/Validation";
 import useAdminAuthStore from "@/store/adminAuthStore";
 import { fetchCountries } from "@/services/countryApi";
+import { count } from "console";
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
 
@@ -146,7 +147,7 @@ const AddLanguagePage = () => {
                   isMulti
                   options={countries.map((country) => ({
                     value: country._id,
-                    label: country.countryName,
+                    label: country.countryName.charAt(0).toUpperCase() + country.countryName.slice(1),
                   }))}
                   className="mb-4 text-black"
                   onChange={(selectedOptions) =>

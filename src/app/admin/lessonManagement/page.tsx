@@ -12,6 +12,7 @@ import { CiEdit } from "react-icons/ci";
 import { CgUnblock } from "react-icons/cg";
 import { MdBlock } from "react-icons/md";
 import useAdminAuthStore from "@/store/adminAuthStore";
+import LoadingPage from "@/components/Loading";
 
 interface Language {
   _id: string;
@@ -46,12 +47,14 @@ const LessonManagementPage = () => {
   const [currentAction, setCurrentAction] = React.useState<"block" | "unblock">(
     "block"
   );
+  const [loadingLessons, setLoadingLessons] = useState<boolean>(false) 
 
   const router = useRouter();
 
   useEffect(() => {
     const fetchLessonsData = async () => {
       try {
+        setLoadingLessons(true)
         const data = await fetchLessons(
           token as string,
           searchCharacters,
@@ -73,6 +76,8 @@ const LessonManagementPage = () => {
         } else {
           console.error("Error fetching lessons data:", error);
         }
+      }finally{
+        setLoadingLessons(false)
       }
     };
     fetchLessonsData();
@@ -122,6 +127,10 @@ const LessonManagementPage = () => {
     await handleBlockUnblock(currentLessonId, currentAction);
     setShowModal(false);
   };
+
+  if(loadingLessons){
+    return <LoadingPage/>
+  }
 
   return (
     <div className="flex flex-col min-h-screen font-sans">

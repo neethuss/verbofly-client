@@ -11,6 +11,7 @@ import ProtectedRoute from "@/HOC/ProtectedRoute";
 import UserNav from "@/components/UserNav";
 import useAuthStore from "@/store/authStore";
 import { User } from "@/Types/chat";
+import LoadingPage from "@/components/Loading";
 
 interface Category {
   id: string;
@@ -40,6 +41,7 @@ const LessonListPage = () => {
   const [categoryName, setCategoryName] = useState<string>("");
   const { languageId, categoryId } = useParams();
   const router = useRouter();
+  const [loadingLessons, setLoadingLessons] = useState<boolean>(false)
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
@@ -75,6 +77,7 @@ const LessonListPage = () => {
     const fetchData = async () => {
       const token = localStorage.getItem("userAccessToken");
       try {
+        setLoadingLessons(true)
         const data = await fetchLessonsInCategoryInLanguage(
           token as string,
           languageId as string,
@@ -101,6 +104,8 @@ const LessonListPage = () => {
         } else {
           toast.error("An error occurred during login. Please try again.");
         }
+      }finally{
+        setLoadingLessons(false)
       }
     };
 
@@ -150,6 +155,10 @@ const LessonListPage = () => {
   const openVideoLesson = (lessonId: string) => {
     router.push(`/lesson/${languageId}/categories/${categoryId}/${lessonId}`);
   };
+
+  if(loadingLessons){
+    return <LoadingPage/>
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-900 text-white font-sans">

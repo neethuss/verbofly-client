@@ -12,6 +12,7 @@ import { CiEdit } from "react-icons/ci";
 import { CgUnblock } from "react-icons/cg";
 import { MdBlock } from "react-icons/md";
 import useAdminAuthStore from "@/store/adminAuthStore";
+import LoadingPage from "@/components/Loading";
 
 interface Country {
   _id: string;
@@ -31,12 +32,14 @@ const CountryManagementPage = () => {
   const [currentAction, setCurrentAction] = React.useState<"block" | "unblock">(
     "block"
   );
+  const [loadingCountries, setLoadingCountries] = useState<boolean>(false)
 
   const router = useRouter();
 
   useEffect(() => {
     const fetchCountriesData = async () => {
       try {
+        setLoadingCountries(true)
         const data = await fetchCountries(
           token as string,
           searchCharacters,
@@ -57,6 +60,8 @@ const CountryManagementPage = () => {
         } else {
           console.error("Error fetching users data:", error);
         }
+      }finally{
+        setLoadingCountries(false)
       }
     };
     fetchCountriesData();
@@ -106,6 +111,10 @@ const CountryManagementPage = () => {
     await handleBlockUnblock(currentCountryId, currentAction);
     setShowModal(false);
   };
+
+  if(loadingCountries){
+    return <LoadingPage/>
+  }
 
   return (
     <div className="flex flex-col min-h-screen font-sans">

@@ -268,7 +268,7 @@ const EditProfile: React.FC = () => {
               <input
                 type="text"
                 name="username"
-                value={user?.username || ""}
+                value={user?.username? user.username.charAt(0).toUpperCase() + user.username.slice(1) : ""}
                 onChange={handleChange}
                 className="mt-1 block w-full text-sm text-white border border-gray-600 rounded-md bg-gray-700 p-2"
               />
@@ -281,7 +281,7 @@ const EditProfile: React.FC = () => {
               <Select
                 options={countries.map((country) => ({
                   value: country._id,
-                  label: country.countryName,
+                  label: country.countryName.charAt(0).toUpperCase() + country.countryName.slice(1),
                 }))}
                 value={selectedCountry}
                 onChange={(selectedOption) => {
@@ -305,7 +305,7 @@ const EditProfile: React.FC = () => {
               <Select
                 options={languages.map((lang) => ({
                   value: lang._id,
-                  label: lang.languageName,
+                  label: lang.languageName.charAt(0).toUpperCase() + lang.languageName.slice(1),
                 }))}
                 value={selectedNativeLanguage}
                 onChange={(selectedOption) => {
@@ -329,7 +329,7 @@ const EditProfile: React.FC = () => {
               <Select
                 options={languages.map((language) => ({
                   value: language._id,
-                  label: language.languageName,
+                  label: language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1),
                 }))}
                 isMulti
                 value={selectedKnownLanguages}
@@ -346,7 +346,7 @@ const EditProfile: React.FC = () => {
               <Select
                 options={languages.map((language) => ({
                   value: language._id,
-                  label: language.languageName,
+                  label: language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1),
                 }))}
                 isMulti
                 value={selectedLanguagesToLearn}

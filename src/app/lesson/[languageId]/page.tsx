@@ -82,7 +82,8 @@ const LessonPage = () => {
 
       <main className="flex flex-1 flex-col justify-center items-center p-8">
         <h1 className="text-4xl font-bold mb-8">
-          Welcome to <span className="text-yellow-400">{language?.languageName} </span>Learning
+          Welcome to <span className="text-yellow-400">{language?.languageName ? language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1) : ''}
+          </span>Learning
         </h1>
         <p className="text-xl text-center mb-12 max-w-3xl">
           Are you ready to embark on an exciting language journey?

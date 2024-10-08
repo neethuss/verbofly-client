@@ -106,7 +106,7 @@ const UserProfile: React.FC = () => {
                 )}
               </div>
               <h2 className="text-xl md:text-2xl font-bold text-yellow-400 mb-4 text-center">
-                {user?.username || "Username"}
+              {user?.username ? user.username.charAt(0).toUpperCase() + user.username.slice(1) : "Username"}
               </h2>
               <Link href="/profile/editProfile">
                 <button className="bg-yellow-400 hover:bg-yellow-500 text-black py-2 px-4 rounded-full flex items-center text-sm md:text-base">
@@ -119,10 +119,10 @@ const UserProfile: React.FC = () => {
               <h3 className="text-xl md:text-2xl font-bold mb-4">Profile Information</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
                 <InfoItem icon={<MdEmail className="text-yellow-400" />} label="Email" value={user?.email} />
-                <InfoItem icon={<SiNationalrail className="text-yellow-400" />} label="Country" value={user?.country?.countryName} />
-                <InfoItem icon={<SiNativescript className="text-yellow-400" />} label="Native Language" value={user?.nativeLanguage?.languageName} />
-                <InfoItem icon={<IoLanguage className="text-yellow-400" />} label="Known Languages" value={user?.knownLanguages?.map(lang => lang.languageName).join(", ")} />
-                <InfoItem icon={<IoLanguage className="text-yellow-400" />} label="Languages to Learn" value={user?.languagesToLearn?.map(lang => lang.languageName).join(", ")} />
+                <InfoItem icon={<SiNationalrail className="text-yellow-400" />} label="Country" value={user?.country?.countryName ? user.country.countryName.charAt(0).toUpperCase() + user.country.countryName.slice(1) : 'N/A'} />
+                <InfoItem icon={<SiNativescript className="text-yellow-400" />} label="Native Language" value={user?.nativeLanguage?.languageName? user.nativeLanguage.languageName.charAt(0).toUpperCase() + user.nativeLanguage.languageName.slice(1) : 'N/A'} />
+                <InfoItem icon={<IoLanguage className="text-yellow-400" />} label="Known Languages" value={user?.knownLanguages? user.knownLanguages.map(lang => lang.languageName.charAt(0).toUpperCase() + lang.languageName.slice(1)).join(", ") : 'N/A'} />
+                <InfoItem icon={<IoLanguage className="text-yellow-400" />} label="Languages to Learn" value={user?.languagesToLearn? user.languagesToLearn.map(lang => lang.languageName.charAt(0).toUpperCase() + lang.languageName.slice(1)).join(", ") : 'N/A'} />
               </div>
 
               <div className="mt-6 md:mt-8">

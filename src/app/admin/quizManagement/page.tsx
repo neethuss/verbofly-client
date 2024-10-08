@@ -10,6 +10,7 @@ import { fetchLessons, lessonBlockUnblock } from "@/services/lessonApi";
 import Modal from "@/components/Modal";
 import { fetchQuizzes } from "@/services/quizApi";
 import useAdminAuthStore from "@/store/adminAuthStore";
+import LoadingPage from "@/components/Loading";
 
 interface IQuizOtpion {
   option: string;
@@ -47,12 +48,14 @@ const QuizManagementPage = () => {
   const [totalQuizzes, setTotalQuizzes] = useState<number>(0);
   const [limit] = useState<number>(10);
   const [selectedQuiz, setSelectedQuiz] = useState<IQuiz | null>(null);
+  const [loadingQuizzes, setLoadingQuizzes] = useState<boolean>(false)
 
   const router = useRouter();
 
   useEffect(() => {
     const fetchQuizzesdata = async () => {
       try {
+        setLoadingQuizzes(true)
         const data = await fetchQuizzes(
           token as string,
           searchCharacters,
@@ -71,6 +74,8 @@ const QuizManagementPage = () => {
         } else {
           console.error("Error fetching lessons data:", error);
         }
+      }finally{
+        setLoadingQuizzes(false)
       }
     };
     fetchQuizzesdata();
@@ -88,6 +93,10 @@ const QuizManagementPage = () => {
   const handleCloseModal = () => {
     setSelectedQuiz(null);
   };
+
+  if(loadingQuizzes){
+    return <LoadingPage/>
+  }
 
   return (
     <div className="flex flex-col min-h-screen font-sans">
@@ -129,12 +138,12 @@ const QuizManagementPage = () => {
                       key={quiz._id}
                       className="border-b border-gray-500 text-center"
                     >
-                      <td className="px-4 py-2 text-white"> {quiz.name}</td>
+                      <td className="px-4 py-2 text-white"> {quiz.name.charAt(0).toUpperCase()+quiz.name.slice(1)}</td>
                       <td className="px-4 py-2 text-white">
-                        {quiz.languageName.languageName}
+                        {quiz.languageName.languageName.charAt(0).toUpperCase() + quiz.languageName.languageName.slice(1)}
                       </td>
                       <td className="px-4 py-2 text-white">
-                        {quiz.categoryName.categoryName}
+                        {quiz.categoryName.categoryName.charAt(0).toUpperCase() + quiz.categoryName.categoryName.slice(1)}
                       </td>
                       <td
                         className="px-4 py-2 text-white underline cursor-pointer hover:text-yellow-400"

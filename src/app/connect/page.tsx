@@ -41,12 +41,14 @@ const ConnectionsPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const router = useRouter();
   const { isAuthenticated, isLoading, logout } = useAuthStore();
+  const [loadingConnections, setLoadingConnections] = useState<boolean>(false)
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
     const fetchCurrentUser = async () => {
       console.log('useEffect in subscription')
       try {
+        setLoadingConnections(true)
         const data = await fetchUser(token as string);
         setCurrentUser(data)
         
@@ -67,12 +69,15 @@ const ConnectionsPage = () => {
           toast.error("An error occurred during login. Please try again.");
         }
       }
+      finally{
+        setLoadingConnections(false)
+      }
     };
     fetchCurrentUser();
   }, [logout]);
 
 
-  if (isLoading) {
+  if (isLoading || loadingConnections) {
     return <LoadingPage />;
   }
 

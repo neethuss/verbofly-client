@@ -135,7 +135,7 @@ const AdminDashboard = () => {
               <div>
                 <MdFeaturedPlayList className="w-8 h-8 sm:w-10 sm:h-10" />
                 <p className="text-base sm:text-lg font-semibold mt-2">
-                  Active Subscription
+                  Total Subscription
                 </p>
                 <p className="text-xl sm:text-2xl font-bold">
                   {subscribedUsers}
@@ -168,7 +168,7 @@ const AdminDashboard = () => {
                     >
                       <td className="py-2 px-3 sm:py-3 sm:px-6">{index + 1}</td>
                       <td className="py-2 px-3 sm:py-3 sm:px-6">
-                        {languageName}
+                        {languageName.charAt(0).toUpperCase() + languageName.slice(1)}
                       </td>
                       <td className="py-2 px-3 sm:py-3 sm:px-6">
                         {users.length}

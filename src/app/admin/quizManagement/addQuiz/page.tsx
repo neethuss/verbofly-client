@@ -153,14 +153,14 @@ const AddQuizPage = () => {
                 className="w-full p-2 border rounded-md bg-transparent border-gray-300"
               />
             </div>
-            <div className="mb-6 text-white ">
+            <div className="mb-6 text-black ">
               <label htmlFor="language" className="block mb-2 font-semibold">
                 Language
               </label>
               <Select
                 options={languages.map((language) => ({
                   value: language._id,
-                  label: language.languageName,
+                  label: language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1),
                 }))}
                 onChange={(selected) =>
                   setSelectedLanguage(selected?.value || null)
@@ -169,14 +169,14 @@ const AddQuizPage = () => {
               />
             </div>
 
-            <div className="mb-6 text-white">
+            <div className="mb-6 text-black">
               <label htmlFor="categories" className="block mb-2 font-semibold">
                 Category
               </label>
               <Select
                 options={categories.map((category) => ({
                   value: category._id,
-                  label: category.categoryName,
+                  label: category.categoryName.charAt(0).toUpperCase() + category.categoryName.slice(1),
                 }))}
                 onChange={(selected) =>
                   setSelectedCategory(selected?.value || null)

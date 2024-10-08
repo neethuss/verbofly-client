@@ -178,7 +178,7 @@ const EditLanguagePage = () => {
                 <input
                   type="text"
                   placeholder="Enter language name"
-                  value={language?.languageName}
+                  value={language?.languageName? language.languageName.charAt(0).toUpperCase()+ language.languageName.slice(1) :"Enter language name" }
                   onChange={(e) => setLanguage(prevLanguage => 
                     prevLanguage 
                       ? { ...prevLanguage, languageName: e.target.value }
@@ -195,7 +195,7 @@ const EditLanguagePage = () => {
                   isMulti
                   options={countries.map((country) => ({
                     value: country._id,
-                    label: country.countryName,
+                    label: country.countryName.charAt(0).toUpperCase() + country.countryName.slice(1),
                   }))}
                   className="mb-4 text-black"
                   value={selectedCountries

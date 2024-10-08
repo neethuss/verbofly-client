@@ -120,7 +120,7 @@ const VideoLessonPage = () => {
     <main className="flex-1 flex items-center justify-center p-4 sm:p-6 md:p-8 md:ml-28 lg:ml-24">
       <div className="max-w-4xl w-full flex flex-col space-y-4">
         <h1 className="text-2xl sm:text-3xl font-bold text-center">
-          <span className="text-yellow-400">{lesson.title}</span>
+          <span className="text-yellow-400">{lesson.title.charAt(0).toUpperCase() + lesson.title.slice(1)}</span>
         </h1>
         <p className="text-gray-300 text-sm sm:text-base text-center">{lesson.description}</p>
         

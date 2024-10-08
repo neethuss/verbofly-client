@@ -11,6 +11,7 @@ import useAuthStore from '@/store/authStore';
 import UserNav from '@/components/UserNav';
 import { fetchUser } from '@/services/userApi';
 import { User } from '@/Types/chat';
+import LoadingPage from '@/components/Loading';
 
 interface Category {
   _id: string;
@@ -31,6 +32,8 @@ const CategoryPage = () => {
   const [subscribed, setSubscribed] = useState(false)
   const router = useRouter();
   const { languageId } = useParams();
+  const [loadingCategories, setLoadingCategories] = useState<boolean>(false)
+
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
@@ -66,6 +69,7 @@ const CategoryPage = () => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        setLoadingCategories(true)
         const token = localStorage.getItem("userAccessToken")
         const data = await fetchCategories(token as string)
         if(data){
@@ -82,6 +86,8 @@ const CategoryPage = () => {
         } else {
           console.error("Error fetching categories data:", error);
         }
+      }finally{
+        setLoadingCategories(false)
       }
     };
 
@@ -111,6 +117,10 @@ const CategoryPage = () => {
     return categoryName.toLowerCase() !== 'beginner' && !subscribed;
   };
 
+  if (loadingCategories) {
+    return <LoadingPage/>
+  }
+
   return (
     <div className="flex min-h-screen bg-gray-900 text-white font-sans">
       <UserNav/>
@@ -138,7 +148,7 @@ const CategoryPage = () => {
                   </div>
                 )}
               </div>
-              <h3 className="text-2xl font-bold mb-2">{category.categoryName}</h3>
+              <h3 className="text-2xl font-bold mb-2">{category.categoryName.charAt(0).toUpperCase() + category.categoryName.slice(1)}</h3>
               <p className="text-center mb-4 text-gray-300">
                 {getCategoryDescription(category.categoryName)}
               </p>

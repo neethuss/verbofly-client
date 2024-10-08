@@ -16,6 +16,7 @@ import ProtectedRoute from "@/HOC/ProtectedRoute";
 import CallNotification from "@/components/CallNofication";
 import Videocall from "@/components/VideoCall";
 import Image from "next/image";
+import LoadingPage from "@/components/Loading";
 
 interface LastMessage {
   _id: string;
@@ -82,6 +83,7 @@ const ChatPage = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roomId, setRoomId] = useState("");
   const currentUserId = user?._id
+  const [loadingChats, setLoadingChats] = useState<boolean>(false)
 
   useEffect(() => {
     console.log(currentUserId, "cuu");
@@ -89,6 +91,7 @@ const ChatPage = () => {
     const fetchUserChats = async () => {
       if (currentUserId) {
         try {
+          setLoadingChats(true)
           const chats = await getUserChats(currentUserId);
           console.log(chats, "AllChats");
 
@@ -176,6 +179,8 @@ const ChatPage = () => {
             }
           }
           console.error("Error fetching user chats:", error);
+        }finally{
+          setLoadingChats(false)
         }
       }
     };
@@ -249,6 +254,10 @@ const ChatPage = () => {
     router.push(`/group/${roomId}`);
     setIsModalOpen(false);
   };
+
+  if(loadingChats){
+    return <LoadingPage/>
+  }
 
   return (
     <div className="flex h-screen bg-gray-900 text-white font-sans relative">
@@ -331,7 +340,7 @@ const ChatPage = () => {
                           {chatUser.lastMessage.senderId === currentUserId
                             ? "Me"
                             : chatUser.lastMessage.senderName}
-                          :`Call`
+                          :<span>Call</span>
                         </div>
                       ) : null}
                     </div>

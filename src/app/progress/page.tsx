@@ -198,7 +198,7 @@ const ProgressPage: React.FC = () => {
               <option value="">Choose a language</option>
               {languages.map((language) => (
                 <option key={language._id} value={language._id}>
-                  {language.languageName}
+                  {language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1)}
                 </option>
               ))}
             </select>

@@ -12,6 +12,7 @@ import { CiEdit } from "react-icons/ci";
 import { CgUnblock } from "react-icons/cg";
 import { MdBlock } from "react-icons/md";
 import useAdminAuthStore from "@/store/adminAuthStore";
+import LoadingPage from "@/components/Loading";
 
 interface Category {
   _id: string;
@@ -31,12 +32,14 @@ const CategoryManagementPage = () => {
   const [currentAction, setCurrentAction] = React.useState<"block" | "unblock">(
     "block"
   );
+  const [loadingCategories, setLoadingCategories] = useState<boolean>(false)
 
   const router = useRouter();
 
   useEffect(() => {
     const fetchCategoriesData = async () => {
       try {
+        setLoadingCategories(true)
         const data = await fetchCategories(
           token as string,
           searchCharacters,
@@ -59,6 +62,8 @@ const CategoryManagementPage = () => {
         } else {
           console.error("Error fetching category data:", error);
         }
+      }finally{
+        setLoadingCategories(false)
       }
     };
     fetchCategoriesData();
@@ -108,6 +113,10 @@ const CategoryManagementPage = () => {
     await handleBlockUnblock(currentCategoryId, currentAction);
     setShowModal(false);
   };
+
+  if(loadingCategories){
+    return <LoadingPage/>
+  }
 
   return (
     <div className="flex flex-col min-h-screen font-sans">
