@@ -26,7 +26,8 @@ export const signupSchema = z.object({
     .min(3, "Username must be at least 3 characters long")
     .regex(/^[a-z]+$/, "Username must contain only small letters"),
   email: z.string().trim().nonempty("Email is required").email("Invalid email format"),
-  password: z.string().trim().nonempty("Password is required").min(6, "Password must be at least 6 characters long"),
+  password: z.string().trim().nonempty("Password is required").min(6, "Password must be at least 6 characters long").regex(/[a-zA-Z]/, { message: "Password must contain at least one letter" })
+    .regex(/[0-9]/, { message: "Password must contain at least one number" }),
   confirmPassword: z
     .string()
     .trim()
@@ -39,7 +40,8 @@ export const signupSchema = z.object({
 
 //zod validation for reset password
 export const resetPasswordSchema = z.object({
-  password: z.string().trim().nonempty("Password is required").min(6, "Password must be at least 6 characters long"),
+  password: z.string().trim().nonempty("Password is required").min(6, "Password must be at least 6 characters long").regex(/[a-zA-Z]/, { message: "Password must contain at least one letter" })
+    .regex(/[0-9]/, { message: "Password must contain at least one number" }),
   confirmPassword: z
     .string()
     .trim()

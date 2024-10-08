@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
@@ -8,6 +8,9 @@ import { RiUserStarLine } from "react-icons/ri";
 import { MdFeaturedPlayList } from "react-icons/md";
 import { fetchUsers } from "@/services/userApi";
 import useAdminAuthStore from "@/store/adminAuthStore";
+import { fetchAllSubscriptions } from "@/services/subscriptionApi";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 interface Country {
   countryName: string;
@@ -33,15 +36,19 @@ interface User {
   receivedRequests: string[];
   isSubscribed: boolean;
   expiryDate: Date;
-  createdAt: Date
+  createdAt: Date;
 }
 
+
 const AdminDashboard = () => {
-  const {token} = useAdminAuthStore()
+  const { token, adminLogout } = useAdminAuthStore();
   const [totalUsers, setTotalUsers] = useState(0);
   const [newUsers, setNewUsers] = useState(0);
   const [subscribedUsers, setSubscribedUsers] = useState(0);
-  const [groupedUsers, setGroupedUsers] = useState<Record<string, { users: User[]; subscribedCount: number }>>({});
+  const [groupedUsers, setGroupedUsers] = useState<
+    Record<string, { users: User[]; subscribedCount: number }>
+  >({});
+ 
 
   useEffect(() => {
     const fetchUsersData = async () => {
@@ -56,15 +63,13 @@ const AdminDashboard = () => {
         const startOfToday = today;
         const endOfToday = new Date(today);
         endOfToday.setDate(startOfToday.getDate() + 1);
-        const usersCreatedToday = users.filter(
-          (user:User) => {
-            const createdAt = new Date(user.createdAt);
-            return createdAt >= startOfToday && createdAt < endOfToday;
-          }
-        );
+        const usersCreatedToday = users.filter((user: User) => {
+          const createdAt = new Date(user.createdAt);
+          return createdAt >= startOfToday && createdAt < endOfToday;
+        });
         setNewUsers(usersCreatedToday.length);
 
-        const subscribedUsers = users.filter((user:User) => user.isSubscribed);
+        const subscribedUsers = users.filter((user: User) => user.isSubscribed);
         setSubscribedUsers(subscribedUsers.length);
 
         const grouped = groupUsersByNativeLanguage(data.users);
@@ -73,6 +78,9 @@ const AdminDashboard = () => {
         console.error("Error fetching user details in dashboard:", error);
       }
     };
+
+    
+
     fetchUsersData();
   }, [token]);
 
@@ -103,34 +111,40 @@ const AdminDashboard = () => {
           />
         </div>
 
-       
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">
           <div className="col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
             <div className="bg-[#1e293b] p-2 sm:p-4 rounded-lg flex items-center h-32">
               <div>
                 <FaUsers className="w-8 h-8 sm:w-10 sm:h-10" />
-                <p className="text-base sm:text-lg font-semibold mt-2">Total Users</p>
+                <p className="text-base sm:text-lg font-semibold mt-2">
+                  Total Users
+                </p>
                 <p className="text-xl sm:text-2xl font-bold">{totalUsers}</p>
               </div>
             </div>
             <div className="bg-[#1e293b] p-4 rounded-lg flex items-center h-32">
               <div>
                 <RiUserStarLine className="w-8 h-8 sm:w-10 sm:h-10" />
-                <p className="text-base sm:text-lg font-semibold mt-2">New Users</p>
+                <p className="text-base sm:text-lg font-semibold mt-2">
+                  New Users
+                </p>
                 <p className="text-xl sm:text-2xl font-bold">{newUsers}</p>
               </div>
             </div>
             <div className="bg-[#1e293b] p-4 rounded-lg flex items-center h-32">
               <div>
                 <MdFeaturedPlayList className="w-8 h-8 sm:w-10 sm:h-10" />
-                <p className="text-base sm:text-lg font-semibold mt-2">Active Subscription</p>
-                <p className="text-xl sm:text-2xl font-bold">{subscribedUsers}</p>
+                <p className="text-base sm:text-lg font-semibold mt-2">
+                  Active Subscription
+                </p>
+                <p className="text-xl sm:text-2xl font-bold">
+                  {subscribedUsers}
+                </p>
               </div>
             </div>
           </div>
         </div>
 
-      
         <div className="bg-[#1e293b] p-4 sm:p-6 rounded-lg">
           <h2 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-4">
             Current users in different native languages
@@ -146,18 +160,31 @@ const AdminDashboard = () => {
                 </tr>
               </thead>
               <tbody>
-                {Object.entries(groupedUsers).map(([languageName, { users, subscribedCount }], index) => (
-                  <tr key={languageName} className="border-t border-[#374151]">
-                    <td className="py-2 px-3 sm:py-3 sm:px-6">{index+1}</td>
-                    <td className="py-2 px-3 sm:py-3 sm:px-6">{languageName}</td>
-                    <td className="py-2 px-3 sm:py-3 sm:px-6">{users.length}</td>
-                    <td className="py-2 px-3 sm:py-3 sm:px-6">{subscribedCount}</td>
-                  </tr>
-                ))}
+                {Object.entries(groupedUsers).map(
+                  ([languageName, { users, subscribedCount }], index) => (
+                    <tr
+                      key={languageName}
+                      className="border-t border-[#374151]"
+                    >
+                      <td className="py-2 px-3 sm:py-3 sm:px-6">{index + 1}</td>
+                      <td className="py-2 px-3 sm:py-3 sm:px-6">
+                        {languageName}
+                      </td>
+                      <td className="py-2 px-3 sm:py-3 sm:px-6">
+                        {users.length}
+                      </td>
+                      <td className="py-2 px-3 sm:py-3 sm:px-6">
+                        {subscribedCount}
+                      </td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </table>
           </div>
         </div>
+
+        
       </div>
     </AdminLayout>
   );
