@@ -353,6 +353,10 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
       get().handleCallCancelled(data.message);
     });
 
+    newSocket.on('callEnded',(data)=>{
+      get().handleCallCancelled(data.message)
+    })
+
 
     newSocket.on('connectionRequestReceived', (userId, username) => {
       console.log('received',userId, username)
