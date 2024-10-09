@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
-import { acceptConnectionRequest, cancelConnectionRequest, fetchUser } from "../../services/userApi";
+import { acceptConnectionRequest, cancelConnectionRequest, fetchUser, rejectConnectionRequest } from "../../services/userApi";
 import UserNav from "@/components/UserNav";
 import ProtectedRoute from "@/HOC/ProtectedRoute";
 import useAuthStore from "@/store/authStore";
@@ -71,8 +71,10 @@ const IncomingRequestsPage = () => {
         > = {};
 
         data.receivedRequests.forEach((request: User) => {
+          console.log(request,'req')
           const isConnected = data.connections.includes(request._id);
           const hasSentRequest = data.sentRequests.includes(request._id);
+          console.log(isConnected, hasSentRequest,'check')
 
           let buttonText = "Connect";
           let buttonColor = "bg-yellow-400 hover:bg-yellow-500 text-black";
@@ -134,8 +136,8 @@ const IncomingRequestsPage = () => {
         }));
         break;
 
-      case "Cancel request":
-        await cancelConnectionRequest(token as string, requestId);
+      case "Reject":
+        await rejectConnectionRequest(token as string, requestId);
         setButtonStates((prev) => ({
           ...prev,
           [requestId]: { text: "Connect", color: "bg-yellow-400 hover:bg-yellow-500 text-black" },

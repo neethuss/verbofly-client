@@ -8,6 +8,7 @@ import {
   cancelConnectionRequest,
   fetchUser,
   fetchUserById,
+  rejectConnectionRequest,
   sendConnectionRequest,
 } from "@/services/userApi";
 import BlankProfile from "../../../../public/asset/blankprofilpicture.webp";
@@ -20,6 +21,7 @@ import { CiSquareQuestion } from "react-icons/ci";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { reject } from "lodash";
 
 interface Country {
   countryName: string;
@@ -46,15 +48,13 @@ interface User {
 }
 
 const Page = () => {
-  const [user, setUser] = useState<User>();
+  const [userNow, setUser] = useState<User>();
   const [currentUser, setCurrentUser] = useState<User>();
-  const [buttonText, setButtonText] = useState<string>("Connect");
-  const [buttonColor, setButtonColor] = useState<string>(
-    "bg-yellow-400 hover:bg-yellow-500 text-black"
-  );
+  const [connectionStatus, setConnectionStatus] = useState<string>("Connect");
+  const [showAcceptReject, setShowAcceptReject] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
 
-  const { logout } = useAuthStore();
+  const { logout, user } = useAuthStore();
   const { nativeId } = useParams();
   const router = useRouter();
 
@@ -100,9 +100,7 @@ const Page = () => {
     const fetchUserData = async () => {
       try {
         const data = await fetchUserById(token as string, nativeId as string);
-        console.log(data, "native user data");
         setCurrentUser(data.nativeUser);
-        console.log(userId, "userise");
         const isConnected = data.nativeUser.connections.some(
           (connection: User) => connection._id === userId
         );
@@ -113,21 +111,19 @@ const Page = () => {
           (request: User) => request._id === userId
         );
 
-        let buttonText = "Connect";
-        let buttonColor = "bg-yellow-400 hover:bg-yellow-500 text-black";
-
         if (isConnected) {
-          buttonText = "Message";
+          setConnectionStatus("Message");
+          setShowAcceptReject(false);
         } else if (hasSentRequest) {
-          buttonText = "Accept";
-          buttonColor = "bg-green-500 hover:bg-green-600 text-white";
+          setConnectionStatus("Accept");
+          setShowAcceptReject(true);
         } else if (hasReceivedRequest) {
-          buttonText = "Cancel Request";
-          buttonColor = "bg-red-500 hover:bg-red-600 text-white";
+          setConnectionStatus("Cancel Request");
+          setShowAcceptReject(false);
+        } else {
+          setConnectionStatus("Connect");
+          setShowAcceptReject(false);
         }
-
-        setButtonText(buttonText);
-        setButtonColor(buttonColor);
       } catch (error) {
         console.error("Failed to fetch user data:", error);
       }
@@ -142,26 +138,38 @@ const Page = () => {
     fetchUserrData();
   }, [nativeId, setUser, user?._id]);
 
-  const handleClick = async (buttonText: string, userId: string) => {
+  const handleConnectionAction = async (action: string) => {
     const token = localStorage.getItem("userAccessToken");
-    switch (buttonText) {
-      case "Accept":
-        await acceptConnectionRequest(token as string, userId);
-        setButtonText("Message");
-        setButtonColor("bg-yellow-400 hover:bg-yellow-500 text-black");
-        break;
-      case "Cancel Request":
-        await cancelConnectionRequest(token as string, userId);
-        setButtonText("Connect");
-        setButtonColor("bg-yellow-400 hover:bg-yellow-500 text-black");
-        break;
-      case "Connect":
-        await sendConnectionRequest(token as string, userId);
-        setButtonText("Cancel Request");
-        setButtonColor("bg-red-500 hover:bg-red-600 text-white");
-        break;
-      default:
-        break;
+    const userId = currentUser?._id as string;
+
+    try {
+      switch (action) {
+        case "Accept":
+          await acceptConnectionRequest(token as string, userId);
+          setConnectionStatus("Message");
+          setShowAcceptReject(false);
+          break;
+        case "Reject":
+          await rejectConnectionRequest(token as string, userId);
+          setConnectionStatus("Connect");
+          setShowAcceptReject(false);
+          break;
+        case "Cancel Request":
+          await cancelConnectionRequest(token as string, userId);
+          setConnectionStatus("Connect");
+          setShowAcceptReject(false);
+          break;
+        case "Connect":
+          await sendConnectionRequest(token as string, userId);
+          setConnectionStatus("Cancel Request");
+          setShowAcceptReject(false);
+          break;
+        default:
+          break;
+      }
+    } catch (error) {
+      console.error("Error handling connection action:", error);
+      toast.error("Failed to perform action. Please try again.");
     }
   };
 
@@ -196,14 +204,37 @@ const Page = () => {
               </h2>
               <p className="text-gray-300 mt-2">{currentUser?.bio}</p>
             </div>
-            <button
-              onClick={() =>
-                handleClick(buttonText, currentUser?._id as string)
-              }
-              className={`py-2 px-6 rounded-full font-bold text-sm uppercase ${buttonColor}`}
-            >
-              {buttonText}
-            </button>
+            <div className="flex flex-col space-y-2">
+              {showAcceptReject ? (
+                <>
+                  <button
+                    onClick={() => handleConnectionAction("Accept")}
+                    className="py-2 px-6 rounded-full font-bold text-sm uppercase bg-green-500 hover:bg-green-600 text-white"
+                  >
+                    Accept
+                  </button>
+                  <button
+                    onClick={() => handleConnectionAction("Reject")}
+                    className="py-2 px-6 rounded-full font-bold text-sm uppercase bg-red-500 hover:bg-red-600 text-white"
+                  >
+                    Reject
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => handleConnectionAction(connectionStatus)}
+                  className={`py-2 px-6 rounded-full font-bold text-sm uppercase ${
+                    connectionStatus === "Connect"
+                      ? "bg-yellow-400 hover:bg-yellow-500 text-black"
+                      : connectionStatus === "Cancel Request"
+                      ? "bg-red-500 hover:bg-red-600 text-white"
+                      : "bg-blue-500 hover:bg-blue-600 text-white"
+                  }`}
+                >
+                  {connectionStatus}
+                </button>
+              )}
+            </div>
           </div>
 
           <div className="mt-8 grid grid-cols-1 md:grid-cols-2 gap-6">

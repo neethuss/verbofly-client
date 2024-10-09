@@ -322,6 +322,20 @@ export const cancelConnectionRequest = async(token:string,cancelId:string) =>{
   return response.data
 }
 
+
+//cancel connection request
+export const rejectConnectionRequest = async(token:string,rejectId:string) =>{
+  const response = await axios.patch(`${BACKEND_URL}/api/rejectConnection`,{
+    rejectId
+  },{
+   headers:{
+     Authorization:  `Bearer ${token}`
+   }
+  })
+  console.log(response.data)
+  return response.data
+}
+
 //accept connection request
 export const acceptConnectionRequest = async(token:string,acceptId:string) =>{
   console.log('going to accept',acceptId)
