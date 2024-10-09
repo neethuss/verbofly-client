@@ -400,6 +400,7 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
   },
 
   emitChatMessage(messageData) {
+    console.log('emitting chat',messageData)
     const { socket } = get()
     socket?.emit('chat message', messageData)
   },

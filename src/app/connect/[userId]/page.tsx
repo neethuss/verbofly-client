@@ -188,16 +188,7 @@ const ChatPage = () => {
     fetchUserChats();
   }, [currentUserId, userId, logout, router]);
 
-  useEffect(() => {
-    if (!socket) {
-      console.log("initializing in page");
-      initializeSocket();
-    }
-
-    return () => {
-      socket?.disconnect();
-    };
-  }, [socket, initializeSocket]);
+ 
 
   const handleUserClick = (userId: string) => {
     const clickedUser = chatUsers.find(
@@ -263,12 +254,7 @@ const ChatPage = () => {
     <div className="flex h-screen bg-gray-900 text-white font-sans relative">
       <UserNav />
       <main className="flex-1 flex flex-col p-8 overflow-hidden lg:ml-24">
-        {ongoingCall && (
-          <div className="absolute inset-0 z-50 ">
-            <CallNotification />
-            <Videocall />
-          </div>
-        )}
+        
 
         <div className="flex justify-end mb-4">
           <button

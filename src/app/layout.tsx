@@ -1,9 +1,12 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
-import 'react-toastify/dist/ReactToastify.css';
+import "react-toastify/dist/ReactToastify.css";
 import SocketInitializer from "@/components/SocketInitializer";
 import NotificationComponent from "@/components/ConnectionNotification";
+import { useSocketStore } from "@/store/socketStore";
+import CallNotification from "@/components/CallNofication";
+import Videocall from "@/components/VideoCall";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -17,13 +20,20 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <body className={inter.className}>
-        <SocketInitializer/>
+        <SocketInitializer />
         {children}
-        <NotificationComponent/>
-        </body>
+        <NotificationComponent />
+       
+          <div className="absolute inset-0 z-50 ">
+            <CallNotification />
+            <Videocall />
+          </div>
+      
+      </body>
     </html>
   );
 }

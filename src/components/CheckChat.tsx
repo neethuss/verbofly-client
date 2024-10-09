@@ -78,7 +78,7 @@ const CheckChat: React.FC<CheckChatProps> = ({
     };
 
     fetchChat();
-  }, [currentUserId, otherUserId]);
+  }, [currentUserId, otherUserId, onMessagesRead]);
 
 
   useEffect(() => {
