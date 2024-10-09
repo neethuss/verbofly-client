@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import 'react-toastify/dist/ReactToastify.css';
+import SocketInitializer from "@/components/SocketInitializer";
+import NotificationComponent from "@/components/ConnectionNotification";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -18,7 +20,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
+        <SocketInitializer/>
         {children}
+        <NotificationComponent/>
         </body>
     </html>
   );

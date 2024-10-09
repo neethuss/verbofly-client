@@ -20,6 +20,7 @@ import { FaSearch, FaUsers } from "react-icons/fa";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Image from "next/image";
+import { useSocketStore } from "@/store/socketStore";
 
 interface Country {
   countryName: string;
@@ -60,6 +61,7 @@ const Page = () => {
   const [filterLanguage, setFilterLanguage] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
+  const {emitConnectionRequest, emitConnectionAccept} = useSocketStore()
 
   const router = useRouter();
   useEffect(() => {
@@ -184,6 +186,7 @@ const Page = () => {
 
     switch (buttonText) {
       case "Accept":
+        emitConnectionAccept(userId,currentUser?._id as string, currentUser?.username as string)
         await acceptConnectionRequest(token as string, userId);
         setButtonStates((prev) => ({
           ...prev,
@@ -206,6 +209,7 @@ const Page = () => {
         break;
 
       case "Connect":
+        emitConnectionRequest(userId,currentUser?._id as string, currentUser?.username as string)
         await sendConnectionRequest(token as string, userId);
         setButtonStates((prev) => ({
           ...prev,

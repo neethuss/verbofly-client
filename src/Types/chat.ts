@@ -6,8 +6,8 @@ export interface LastMessage {
   senderId: string;
   senderName: string | undefined;
   image: string;
-  audio:string
-  call:boolean
+  audio: string
+  call: boolean
 }
 
 export interface Message {
@@ -16,8 +16,8 @@ export interface Message {
   senderId: string;
   messageText: string;
   image?: string;
-  audio?:string
-  call?:boolean
+  audio?: string
+  call?: boolean
   createdAt: string;
   readAt: Date;
 }
@@ -29,44 +29,44 @@ export interface OtherUser {
   profilePhoto: string;
 }
 
-export interface User{
-  username : string;
-  email : string;
-  password : string;
-  isBlocked : boolean;
-  country : Country
-  nativeLanguage : Language
-  knownLanguages : Language[]
-  languagesToLearn : Language[]
-  profilePhoto : string
-  bio : string
-  sentRequests: User[]; 
-  receivedRequests: User[]; 
-  connections: User[]; 
-  isSubscribed :boolean;
-  expirationDate : Date
+export interface User {
+  username: string;
+  email: string;
+  password: string;
+  isBlocked: boolean;
+  country: Country
+  nativeLanguage: Language
+  knownLanguages: Language[]
+  languagesToLearn: Language[]
+  profilePhoto: string
+  bio: string
+  sentRequests: User[];
+  receivedRequests: User[];
+  connections: User[];
+  isSubscribed: boolean;
+  expirationDate: Date
 }
 
-export interface Country{
-  countryName : string,
-  isBlocked : boolean
+export interface Country {
+  countryName: string,
+  isBlocked: boolean
 }
 
-export interface Language{
-  languageName : string;
-  countries :  Country[];
-  isBlocked : boolean
+export interface Language {
+  languageName: string;
+  countries: Country[];
+  isBlocked: boolean
 }
 
-export interface Participants{
-  caller:User
-  receiver:User 
+export interface Participants {
+  caller: User
+  receiver: User
 }
 
-export interface OngoingCall{
-  participants:Participants
-  isRinging:boolean
-} 
+export interface OngoingCall {
+  participants: Participants
+  isRinging: boolean
+}
 
 export interface ChatProps {
   currentUserId: string;
@@ -78,29 +78,36 @@ export interface ChatProps {
 }
 
 export interface CheckChatProps {
-  currentUserId:string
-  otherUserId:string
+  currentUserId: string
+  otherUserId: string
   otherUserDetails: User
-  onNewMessage:(userId:string,messageData:LastMessage) => void
-  onMessagesRead:(userId:string)=> void
+  onNewMessage: (userId: string, messageData: LastMessage) => void
+  onMessagesRead: (userId: string) => void
 
 }
 
-export interface IVideoContainer{
-  stream:MediaStream | null
-  isLocalStream:boolean
-  isOnCall:boolean
-  className?: string; 
+export interface IVideoContainer {
+  stream: MediaStream | null
+  isLocalStream: boolean
+  isOnCall: boolean
+  className?: string;
 }
 
-export interface IVideoCall{
-  localStream:MediaStream|null
+export interface IVideoCall {
+  localStream: MediaStream | null
   isOnCall: boolean;
   peer: PeerData | null
 }
 
-export interface PeerData{
-  peerConnection :Peer.Instance
-  stream :MediaStream | undefined
-  participantUser:User
+export interface PeerData {
+  peerConnection: Peer.Instance
+  stream: MediaStream | undefined
+  participantUser: User
+}
+
+export interface Notification {
+  type: 'received' | 'accept';
+  userId: string;
+  username: string
+  id: number;
 }

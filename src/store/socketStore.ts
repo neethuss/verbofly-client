@@ -2,7 +2,7 @@
 import { io, Socket } from 'socket.io-client'
 import { create } from 'zustand'
 import useAuthStore from './authStore'
-import { OngoingCall, Participants, PeerData, User } from '@/Types/chat'
+import { Notification, OngoingCall, Participants, PeerData, User } from '@/Types/chat'
 import Peer, { SignalData } from 'simple-peer'
 
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
@@ -15,6 +15,7 @@ interface iSocketState {
   ongoingCall: OngoingCall | null
   localStream: MediaStream | null
   peer: PeerData | null
+
 
   emitJoinChat: (chatId: string) => void;
 
@@ -45,6 +46,13 @@ interface iSocketState {
   handleHangup: () => void
 
   completePeerConnection: (data: { sdp: SignalData, ongoingCall: OngoingCall, isCaller: boolean }) => void
+
+  notifications: Notification[]
+  addNotification: (newNotification: Notification) => void
+  removeNotification: (id: number) => void
+
+  emitConnectionRequest: (receiverId: string, userId:string, username:string) => void
+  emitConnectionAccept: (receiverId: string, userId:string, username:string) => void
 }
 
 export const useSocketStore = create<iSocketState>((set, get) => ({
@@ -53,6 +61,20 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
   ongoingCall: null,
   localStream: null,
   peer: null,
+
+  notifications: [],
+
+  addNotification: (newNotification) => {
+    set(state => ({
+      notifications: [...state.notifications, newNotification]
+    }));
+  },
+
+  removeNotification: (id) => {
+    set(state => ({
+      notifications: state.notifications.filter(notification => notification.id !== id)
+    }));
+  },
 
   getMediaStream: async (faceMode) => {
     const localStream = get().localStream
@@ -331,6 +353,27 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
       get().handleCallCancelled(data.message);
     });
 
+
+    newSocket.on('connectionRequestReceived', (userId, username) => {
+      console.log('received',userId, username)
+      get().addNotification({
+        type: 'received',
+        userId: userId,
+        username:username,
+        id: Date.now(),
+      });
+    });
+
+
+    newSocket.on('connectionRequestAccepted', (userId, username) => {
+      get().addNotification({
+        type: 'accept',
+        userId: userId,
+        username:username,
+        id: Date.now(),
+      });
+    });
+
     newSocket.on('connect', onConnect)
     newSocket.on('disconnect', onDisconnect)
 
@@ -353,18 +396,24 @@ export const useSocketStore = create<iSocketState>((set, get) => ({
 
   emitJoinChat: (chatId: string) => {
     const { socket } = get();
-
     socket?.emit('join chat', { chatId });
   },
 
   emitChatMessage(messageData) {
-    console.log('emitting')
     const { socket } = get()
-    console.log(socket)
     socket?.emit('chat message', messageData)
   },
 
+  emitConnectionRequest(receiverId,userId,username) {
+    console.log('going to emit the request')
+    const { socket } = get();
+    socket?.emit('sent connection request',  receiverId,userId,username );
+  },
 
+  emitConnectionAccept(receiverId,userId,username) {
+    const { socket } = get();
+    socket?.emit('accept connetion request',  receiverId ,userId,username)
+  },
 
 }))
 

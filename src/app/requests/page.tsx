@@ -12,6 +12,7 @@ import { IoMdGlobe } from "react-icons/io";
 import { MdLanguage } from "react-icons/md";
 import axios from "axios";
 import LoadingPage from "@/components/Loading";
+import { useSocketStore } from "@/store/socketStore";
 
 interface Country {
   countryName: string;
@@ -43,6 +44,7 @@ const IncomingRequestsPage = () => {
   >({});
   const router = useRouter();
   const { setUser ,logout} = useAuthStore();
+  const {emitConnectionAccept, emitConnectionRequest} = useSocketStore()
   const [loadingRequests, setLoadingRequests] = useState<boolean>(false)
 
   useEffect(() => {
@@ -129,6 +131,7 @@ const IncomingRequestsPage = () => {
 
     switch (buttonText) {
       case "Accept":
+        emitConnectionAccept(requestId, user?._id as string, user?.username as string)
         await acceptConnectionRequest(token as string, requestId);
         setButtonStates((prev) => ({
           ...prev,

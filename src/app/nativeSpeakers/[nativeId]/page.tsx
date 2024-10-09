@@ -22,6 +22,7 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import Image from "next/image";
 import { reject } from "lodash";
+import { useSocketStore } from "@/store/socketStore";
 
 interface Country {
   countryName: string;
@@ -55,6 +56,7 @@ const Page = () => {
   const [showModal, setShowModal] = useState<boolean>(false);
 
   const { logout, user } = useAuthStore();
+  const {emitConnectionAccept, emitConnectionRequest} = useSocketStore()
   const { nativeId } = useParams();
   const router = useRouter();
 
@@ -145,6 +147,7 @@ const Page = () => {
     try {
       switch (action) {
         case "Accept":
+          emitConnectionAccept(currentUser?._id as string, userNow?._id as string, userNow?.username as string)
           await acceptConnectionRequest(token as string, userId);
           setConnectionStatus("Message");
           setShowAcceptReject(false);
@@ -160,6 +163,7 @@ const Page = () => {
           setShowAcceptReject(false);
           break;
         case "Connect":
+          emitConnectionRequest(currentUser?._id as string, userNow?._id as string, userNow?.username as string)
           await sendConnectionRequest(token as string, userId);
           setConnectionStatus("Cancel Request");
           setShowAcceptReject(false);
