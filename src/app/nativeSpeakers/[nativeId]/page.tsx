@@ -23,6 +23,7 @@ import { toast } from "react-toastify";
 import Image from "next/image";
 import { reject } from "lodash";
 import { useSocketStore } from "@/store/socketStore";
+import LoadingPage from "@/components/Loading";
 
 interface Country {
   countryName: string;
@@ -54,6 +55,7 @@ const Page = () => {
   const [connectionStatus, setConnectionStatus] = useState<string>("Connect");
   const [showAcceptReject, setShowAcceptReject] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
+  const [loadingUser, setLoadingUser] = useState<boolean>(false)
 
   const { logout, user } = useAuthStore();
   const {emitConnectionAccept, emitConnectionRequest} = useSocketStore()
@@ -101,6 +103,7 @@ const Page = () => {
     const userId = user?._id;
     const fetchUserData = async () => {
       try {
+        setLoadingUser(true)
         const data = await fetchUserById(token as string, nativeId as string);
         setCurrentUser(data.nativeUser);
         const isConnected = data.nativeUser.connections.some(
@@ -128,6 +131,8 @@ const Page = () => {
         }
       } catch (error) {
         console.error("Failed to fetch user data:", error);
+      }finally{
+        setLoadingUser(false)
       }
     };
 
@@ -145,6 +150,7 @@ const Page = () => {
     const userId = currentUser?._id as string;
 
     try {
+      setLoadingUser(true)
       switch (action) {
         case "Accept":
           emitConnectionAccept(currentUser?._id as string, userNow?._id as string, userNow?.username as string)
@@ -174,6 +180,8 @@ const Page = () => {
     } catch (error) {
       console.error("Error handling connection action:", error);
       toast.error("Failed to perform action. Please try again.");
+    }finally{
+      setLoadingUser(false)
     }
   };
 
@@ -181,6 +189,10 @@ const Page = () => {
     if (!string) return "";
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
+
+  if(loadingUser){
+    return <LoadingPage/>
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-900 text-white font-sans">
