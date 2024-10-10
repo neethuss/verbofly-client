@@ -168,6 +168,11 @@ const Page = () => {
           setConnectionStatus("Cancel Request");
           setShowAcceptReject(false);
           break;
+        case "Message":
+          emitConnectionRequest(currentUser?._id as string, userNow?._id as string, userNow?.username as string)
+         router.push('/connections')
+          setShowAcceptReject(false);
+          break;
         default:
           break;
       }
