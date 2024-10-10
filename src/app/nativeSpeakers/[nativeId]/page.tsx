@@ -114,7 +114,7 @@ const Page = () => {
         );
 
         if (isConnected) {
-          setConnectionStatus("Message");
+          setConnectionStatus("");
           setShowAcceptReject(false);
         } else if (hasSentRequest) {
           setConnectionStatus("Accept");
@@ -149,7 +149,7 @@ const Page = () => {
         case "Accept":
           emitConnectionAccept(currentUser?._id as string, userNow?._id as string, userNow?.username as string)
           await acceptConnectionRequest(token as string, userId);
-          setConnectionStatus("Message");
+          setConnectionStatus("");
           setShowAcceptReject(false);
           break;
         case "Reject":
@@ -166,11 +166,6 @@ const Page = () => {
           emitConnectionRequest(currentUser?._id as string, userNow?._id as string, userNow?.username as string)
           await sendConnectionRequest(token as string, userId);
           setConnectionStatus("Cancel Request");
-          setShowAcceptReject(false);
-          break;
-        case "Message":
-          emitConnectionRequest(currentUser?._id as string, userNow?._id as string, userNow?.username as string)
-         router.push('/connections')
           setShowAcceptReject(false);
           break;
         default:
