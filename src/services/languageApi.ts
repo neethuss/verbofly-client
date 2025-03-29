@@ -34,7 +34,6 @@ export const fetchLanguageById = async( token:string,languageId:string,) => {
 export const languageBlockUnblock = async(action:string, id:string, token:string)=> {
   try {
     console.log(action,'action')
-    console.log('forn')
     const response = await axios.patch(`${BACKEND_URL}/language/${action}/${id}`,{},{
       headers : {
         Authorization : `Bearer ${token}`

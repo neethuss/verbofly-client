@@ -11,6 +11,7 @@ import Modal from "@/components/Modal";
 import { fetchQuizzes } from "@/services/quizApi";
 import useAdminAuthStore from "@/store/adminAuthStore";
 import LoadingPage from "@/components/Loading";
+import { CiEdit } from "react-icons/ci";
 
 interface IQuizOtpion {
   option: string;
@@ -41,21 +42,21 @@ interface IQuiz {
 }
 
 const QuizManagementPage = () => {
-  const {token, adminLogout} = useAdminAuthStore()
+  const { token, adminLogout } = useAdminAuthStore();
   const [quizzes, setQuizzes] = useState<IQuiz[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [totalQuizzes, setTotalQuizzes] = useState<number>(0);
   const [limit] = useState<number>(10);
   const [selectedQuiz, setSelectedQuiz] = useState<IQuiz | null>(null);
-  const [loadingQuizzes, setLoadingQuizzes] = useState<boolean>(false)
+  const [loadingQuizzes, setLoadingQuizzes] = useState<boolean>(false);
 
   const router = useRouter();
 
   useEffect(() => {
     const fetchQuizzesdata = async () => {
       try {
-        setLoadingQuizzes(true)
+        setLoadingQuizzes(true);
         const data = await fetchQuizzes(
           token as string,
           searchCharacters,
@@ -70,12 +71,12 @@ const QuizManagementPage = () => {
       } catch (error) {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
           toast.error("Token expired...Login again!");
-          adminLogout()
+          adminLogout();
         } else {
           console.error("Error fetching lessons data:", error);
         }
-      }finally{
-        setLoadingQuizzes(false)
+      } finally {
+        setLoadingQuizzes(false);
       }
     };
     fetchQuizzesdata();
@@ -94,8 +95,12 @@ const QuizManagementPage = () => {
     setSelectedQuiz(null);
   };
 
-  if(loadingQuizzes){
-    return <LoadingPage/>
+  const handleEdit = (quizId: string) => {
+    router.push(`/admin/quizManagement/${quizId}`);
+  };
+
+  if (loadingQuizzes) {
+    return <LoadingPage />;
   }
 
   return (
@@ -130,6 +135,7 @@ const QuizManagementPage = () => {
                     <th className="py-2 px-4 text-white">Language</th>
                     <th className="py-2 px-4 text-white">Category</th>
                     <th className="py-2 px-4 text-white">More</th>
+                    <th className="py-2 px-4 text-white">Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -138,18 +144,34 @@ const QuizManagementPage = () => {
                       key={quiz._id}
                       className="border-b border-gray-500 text-center"
                     >
-                      <td className="px-4 py-2 text-white"> {quiz.name.charAt(0).toUpperCase()+quiz.name.slice(1)}</td>
                       <td className="px-4 py-2 text-white">
-                        {quiz.languageName.languageName.charAt(0).toUpperCase() + quiz.languageName.languageName.slice(1)}
+                        {" "}
+                        {quiz.name.charAt(0).toUpperCase() + quiz.name.slice(1)}
                       </td>
                       <td className="px-4 py-2 text-white">
-                        {quiz.categoryName.categoryName.charAt(0).toUpperCase() + quiz.categoryName.categoryName.slice(1)}
+                        {quiz.languageName.languageName
+                          .charAt(0)
+                          .toUpperCase() +
+                          quiz.languageName.languageName.slice(1)}
+                      </td>
+                      <td className="px-4 py-2 text-white">
+                        {quiz.categoryName.categoryName
+                          .charAt(0)
+                          .toUpperCase() +
+                          quiz.categoryName.categoryName.slice(1)}
                       </td>
                       <td
                         className="px-4 py-2 text-white underline cursor-pointer hover:text-yellow-400"
                         onClick={() => handleViewQuestions(quiz)}
                       >
                         view questions...
+                      </td>
+
+                      <td className="flex justify-center gap-3">
+                        <CiEdit
+                          className=" text-blue-800 cursor-pointer"
+                          onClick={() => handleEdit(quiz._id)}
+                        />
                       </td>
                     </tr>
                   ))}

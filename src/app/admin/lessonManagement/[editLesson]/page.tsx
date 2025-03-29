@@ -60,6 +60,8 @@ const EditLessonPage = () => {
   } | null>(null);
   const [errors, setErrors] = useState<LessonErrors>({});
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
+  const [hasExistingVideo, setHasExistingVideo] = useState<boolean>(false);
+
 
   const router = useRouter();
   const { editLesson } = useParams() as { editLesson: string };
@@ -72,7 +74,10 @@ const EditLessonPage = () => {
         setLesson(data);
         setTitle(data.title);
         setDescription(data.description);
-        setVideoPreviewUrl(data.content);
+        if (data.content) {
+          setVideoPreviewUrl(data.content);
+          setHasExistingVideo(true);
+        }
         setSelectedLanguage({
           value: data.languageName._id,
           label: data.languageName.languageName,
@@ -101,65 +106,50 @@ const EditLessonPage = () => {
 
   const handleEdit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-
-    if (!title || !description || !selectedFile || !selectedLanguage || !selectedCategory) {
-      setErrors({ general: "All fields must be filled out" });
+    
+    if (!title || !description || !selectedLanguage || !selectedCategory) {
+      setErrors({ general: "Required fields must be filled out" });
       return;
     }
+    
     setErrors({});
-
-    const validationResult = lessonSchema.safeParse({
-      title,
-      description,
-      content: selectedFile,
-      languageName: selectedLanguage?.value || "",
-      categoryName: selectedCategory?.value || "",
-    });
-
-    if (!validationResult.success) {
-      const fieldErrors = validationResult.error.format();
-      setErrors({
-        title: fieldErrors.title?._errors[0],
-        description: fieldErrors.description?._errors[0],
-        content: fieldErrors.content?._errors[0],
-        languageName: fieldErrors.languageName?._errors[0],
-        categoryName: fieldErrors.categoryName?._errors[0],
-      });
-      return;
-    } else {
-      setErrors({});
-    }
-
-    if (!selectedFile) {
-      toast.error("Please select a video file.");
-      return;
-    }
-
+    
     const formData = new FormData();
-    formData.append("title", title);
-    formData.append("description", description);
+  formData.append("title", title);
+  formData.append("description", description);
+  formData.append("languageName", selectedLanguage?.value || "");
+  formData.append("categoryName", selectedCategory?.value || "");
+  
+  if (selectedFile) {
     formData.append("file", selectedFile);
-    formData.append("languageName", selectedLanguage?.value || "");
-    formData.append("categoryName", selectedCategory?.value || "");
-
+  }
+  
+  // Alternative way to log FormData without for...of
+  console.log('FormData contents:');
+  console.log('title:', formData.get('title'));
+  console.log('description:', formData.get('description'));
+  console.log('languageName:', formData.get('languageName'));
+  console.log('categoryName:', formData.get('categoryName'));
+  console.log('file:', formData.get('file'));
+    
     try {
-      const response = await editALesson(token as string,editLesson, formData)
-      if (response.status === 201) {
+      console.log(formData, 'data')
+      const response = await editALesson(token as string, editLesson, formData);
+      if (response.status === 200) {
         toast.success("Lesson edited successfully!");
         router.push("/admin/lessonManagement");
       } else {
-        toast.error("Lesson already exist with this title");
+        toast.error("Lesson already exists with this title");
       }
     } catch (error) {
       if (axios.isAxiosError(error) && error.response?.status === 401) {
-        toast.error("Token expired...Login again!");
-       adminLogout()
+        toast.error("Token expired... Login again!");
+        adminLogout();
       } else {
-        console.error("Error adding lesson:", error);
+        console.error("Error editing lesson:", error);
       }
     }
   };
-
   const handleFileInput = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
     setSelectedFile(file);
@@ -171,6 +161,7 @@ const EditLessonPage = () => {
 
   const handleDeleteVideo = () => {
     setSelectedFile(null);
+    setHasExistingVideo(false);
     setVideoPreviewUrl(null);
   };
 
@@ -266,12 +257,14 @@ const EditLessonPage = () => {
                     </p>
                   )}
                 </div>
-                <input
-                  type="file"
-                  accept="video/*"
-                  onChange={handleFileInput}
-                  className="mb-4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 w-full"
-                />
+                {!hasExistingVideo && (
+        <input
+          type="file"
+          accept="video/*"
+          onChange={handleFileInput}
+          className="mb-4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 w-full"
+        />
+      )}
                 {errors.content && (
                   <p className="mt-1 text-red-500 text-sm">{errors.content}</p>
                 )}

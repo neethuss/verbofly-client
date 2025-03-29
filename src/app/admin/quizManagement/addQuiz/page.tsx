@@ -9,6 +9,8 @@ import { addQuiz } from "@/services/quizApi";
 import { toast, ToastContainer } from "react-toastify";
 import { useRouter } from "next/navigation";
 import useAdminAuthStore from "@/store/adminAuthStore";
+import AdminProtedctedRoute from "@/HOC/AdminProtectedRoute";
+
 
 interface ILanguage {
   _id: string;
@@ -124,7 +126,7 @@ const AddQuizPage = () => {
       if (response.status === 201) {
         toast("Quiz created successfully");
         router.push("/admin/quizManagement");
-      } else {
+      } else if(response.status === 200){
         console.log("already");
         toast(
           `Quiz already existing in the selected category in selected language`
@@ -307,4 +309,4 @@ const AddQuizPage = () => {
   );
 };
 
-export default AddQuizPage;
+export default AdminProtedctedRoute(AddQuizPage);

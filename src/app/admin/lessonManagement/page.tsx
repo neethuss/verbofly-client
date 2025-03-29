@@ -32,11 +32,11 @@ interface Lesson {
   languageName: Language;
   categoryName: Category;
   isBlocked: boolean;
-  createdAt:Date
+  createdAt: Date;
 }
 
 const LessonManagementPage = () => {
-  const {token, adminLogout} = useAdminAuthStore()
+  const { token, adminLogout } = useAdminAuthStore();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
   const [page, setPage] = useState<number>(1);
@@ -47,14 +47,14 @@ const LessonManagementPage = () => {
   const [currentAction, setCurrentAction] = React.useState<"block" | "unblock">(
     "block"
   );
-  const [loadingLessons, setLoadingLessons] = useState<boolean>(false) 
+  const [loadingLessons, setLoadingLessons] = useState<boolean>(false);
 
   const router = useRouter();
 
   useEffect(() => {
     const fetchLessonsData = async () => {
       try {
-        setLoadingLessons(true)
+        setLoadingLessons(true);
         const data = await fetchLessons(
           token as string,
           searchCharacters,
@@ -62,7 +62,10 @@ const LessonManagementPage = () => {
           limit
         );
         if (data) {
-          const lessons = data.lessons.sort((a:Lesson,b:Lesson)=>new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+          const lessons = data.lessons.sort(
+            (a: Lesson, b: Lesson) =>
+              new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          );
           setLessons(lessons);
           setTotalLessons(data.total);
         }
@@ -70,14 +73,14 @@ const LessonManagementPage = () => {
         if (axios.isAxiosError(error) && error.response?.status === 401) {
           console.error(
             "Token expired or unauthorized. Redirecting to login..."
-          );;
+          );
           toast.error("Token expired...Login again!");
-          adminLogout()
+          adminLogout();
         } else {
           console.error("Error fetching lessons data:", error);
         }
-      }finally{
-        setLoadingLessons(false)
+      } finally {
+        setLoadingLessons(false);
       }
     };
     fetchLessonsData();
@@ -128,8 +131,8 @@ const LessonManagementPage = () => {
     setShowModal(false);
   };
 
-  if(loadingLessons){
-    return <LoadingPage/>
+  if (loadingLessons) {
+    return <LoadingPage />;
   }
 
   return (
@@ -177,19 +180,28 @@ const LessonManagementPage = () => {
                       key={lesson._id}
                       className="border-b border-gray-500 text-center"
                     >
-                      <td className="px-4 py-2 text-white">{lesson.title.charAt(0).toUpperCase() + lesson.title.slice(1)}</td>
+                      <td className="px-4 py-2 text-white">
+                        {lesson.title.charAt(0).toUpperCase() +
+                          lesson.title.slice(1)}
+                      </td>
                       <td className="px-4 py-2 text-white">
                         {lesson.description}
                       </td>
                       <td className="px-4 py-2 text-white">{lesson.content}</td>
                       <td className="px-4 py-2 text-white">
-                        {lesson.categoryName.categoryName.charAt(0).toUpperCase() + lesson.categoryName.categoryName.slice(1)}
+                        {lesson.categoryName.categoryName
+                          .charAt(0)
+                          .toUpperCase() +
+                          lesson.categoryName.categoryName.slice(1)}
                       </td>
                       <td className="px-4 py-2 text-white">
-                        {lesson.languageName.languageName.charAt(0).toUpperCase() + lesson.languageName.languageName.slice(1)}
+                        {lesson.languageName.languageName
+                          .charAt(0)
+                          .toUpperCase() +
+                          lesson.languageName.languageName.slice(1)}
                       </td>
                       <td className="px-4 py-2 text-white">
-                      <div className="flex justify-center gap-3">
+                        <div className="flex justify-center gap-3">
                           <CiEdit
                             className=" text-blue-800 cursor-pointer"
                             onClick={() => handleEdit(lesson._id)}

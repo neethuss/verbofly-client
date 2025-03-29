@@ -85,6 +85,7 @@ export const addLesson = async(token:string, formData:FormData) => {
 }
 
 export const editALesson = async(token:string,lessonId:string, formData:FormData) => {
+  console.log(formData, 'bofy data')
   const response = await axios.patch(`${BACKEND_URL}/lesson/${lessonId}`, formData,{
     headers: {
       "Content-Type": "multipart/form-data",

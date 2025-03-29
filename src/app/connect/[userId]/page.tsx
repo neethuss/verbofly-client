@@ -25,8 +25,8 @@ interface LastMessage {
   senderId: string;
   senderName: string | undefined;
   image: string;
-  audio:string
-  call:boolean
+  audio: string;
+  call: boolean;
 }
 
 export interface User {
@@ -82,8 +82,8 @@ const ChatPage = () => {
 
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [roomId, setRoomId] = useState("");
-  const currentUserId = user?._id
-  const [loadingChats, setLoadingChats] = useState<boolean>(false)
+  const currentUserId = user?._id;
+  const [loadingChats, setLoadingChats] = useState<boolean>(false);
 
   useEffect(() => {
     console.log(currentUserId, "cuu");
@@ -91,7 +91,7 @@ const ChatPage = () => {
     const fetchUserChats = async () => {
       if (currentUserId) {
         try {
-          setLoadingChats(true)
+          setLoadingChats(true);
           const chats = await getUserChats(currentUserId);
           console.log(chats, "AllChats");
 
@@ -118,7 +118,7 @@ const ChatPage = () => {
                 userId as string
               );
               setSelectedChatUserId(userId as string);
-              setSelectedChatUserId(newChatUser.nativeUser);
+              setSelectedChatUserId(newChatUser.nativeUser._id);
               setChatUsers([
                 {
                   _id: "temp",
@@ -129,8 +129,8 @@ const ChatPage = () => {
                     senderId: "",
                     senderName: "",
                     image: "",
-                    audio:"",
-                    call:false
+                    audio: "",
+                    call: false,
                   },
                   otherUser: newChatUser.nativeUser,
                   unreadMessages: 0,
@@ -149,7 +149,7 @@ const ChatPage = () => {
               userId as string
             );
             setSelectedChatUserId(userId as string);
-            setSelectedChatUserId(newChatUser.nativeUser);
+            setSelectedChatUserId(newChatUser.nativeUser._id);
             setChatUsers([
               {
                 _id: "temp",
@@ -161,7 +161,7 @@ const ChatPage = () => {
                   senderName: "",
                   image: "",
                   audio: "",
-                  call:false
+                  call: false,
                 },
                 otherUser: newChatUser.nativeUser,
                 unreadMessages: 0,
@@ -171,6 +171,7 @@ const ChatPage = () => {
           } else {
             setChatUsers([]);
           }
+          
         } catch (error) {
           if (axios.isAxiosError(error)) {
             if (error.response && error.response.status === 403) {
@@ -179,16 +180,14 @@ const ChatPage = () => {
             }
           }
           console.error("Error fetching user chats:", error);
-        }finally{
-          setLoadingChats(false)
+        } finally {
+          setLoadingChats(false);
         }
       }
     };
 
     fetchUserChats();
   }, [currentUserId, userId, logout, router]);
-
- 
 
   const handleUserClick = (userId: string) => {
     const clickedUser = chatUsers.find(
@@ -246,16 +245,36 @@ const ChatPage = () => {
     setIsModalOpen(false);
   };
 
-  if(loadingChats){
-    return <LoadingPage/>
+  if (loadingChats) {
+    return <LoadingPage />;
   }
+
+  const formatMessageTime = (dateString: string): string => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInMinutes = Math.floor(
+      (now.getTime() - date.getTime()) / (1000 * 60)
+    );
+
+    if (diffInMinutes < 1) return "Just now";
+    if (diffInMinutes < 60) return `${diffInMinutes}m`;
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours}h`;
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 7) return `${diffInDays}d`;
+
+    return new Intl.DateTimeFormat("en-US", {
+      month: "short",
+      day: "numeric",
+    }).format(date);
+  };
 
   return (
     <div className="flex h-screen bg-gray-900 text-white font-sans relative">
       <UserNav />
       <main className="flex-1 flex flex-col p-8 overflow-hidden lg:ml-24">
-        
-
         <div className="flex justify-end mb-4">
           <button
             onClick={handleOpenModal}
@@ -283,7 +302,6 @@ const ChatPage = () => {
                     }`}
                     onClick={() => handleUserClick(chatUser.otherUser._id)}
                   >
-                    
                     <Image
                       className="w-10 h-10 rounded-full mr-3"
                       src={
@@ -295,9 +313,19 @@ const ChatPage = () => {
                       alt={chatUser.otherUser.username}
                     />
                     <div className="flex-1">
-                      <div className="font-semibold">
-                        {chatUser.otherUser.username.charAt(0).toUpperCase() +
-                          chatUser.otherUser.username.slice(1)}
+                      <div className="flex justify-between items-center">
+                        <div className="font-semibold">
+                          {chatUser.otherUser.username.charAt(0).toUpperCase() +
+                            chatUser.otherUser.username.slice(1)}
+                        </div>
+                        {chatUser.lastMessage &&
+                          chatUser.lastMessage.createdAt && (
+                            <span className="text-xs opacity-75">
+                              {formatMessageTime(
+                                chatUser.lastMessage.createdAt
+                              )}
+                            </span>
+                          )}
                       </div>
                       {chatUser.lastMessage.image ? (
                         <div className="text-sm opacity-75">
@@ -306,7 +334,7 @@ const ChatPage = () => {
                             : chatUser.lastMessage.senderName}
                           : <span>📷 Photo</span>
                         </div>
-                      ) : chatUser.lastMessage.audio ? ( 
+                      ) : chatUser.lastMessage.audio ? (
                         <div className="text-sm opacity-75">
                           {chatUser.lastMessage.senderId === currentUserId
                             ? "Me"
@@ -320,8 +348,7 @@ const ChatPage = () => {
                             : chatUser.lastMessage.senderName}
                           : {chatUser.lastMessage.messageText}
                         </div>
-                      ) :
-                      chatUser.lastMessage.call ? (
+                      ) : chatUser.lastMessage.call ? (
                         <div className="text-sm opacity-75">
                           {chatUser.lastMessage.senderId === currentUserId
                             ? "Me"
@@ -376,7 +403,9 @@ const ChatPage = () => {
         <div className="fixed inset-0 flex items-center justify-center bg-gray-800 bg-opacity-75">
           <div className="bg-gray-900 p-6 rounded-lg shadow-lg w-1/3">
             <form onSubmit={handleCreateGroup}>
-              <h2 className="text-2xl font-bold mb-4">Enter a conference meeting</h2>
+              <h2 className="text-2xl font-bold mb-4">
+                Enter a conference meeting
+              </h2>
               <input
                 type="text"
                 value={roomId}

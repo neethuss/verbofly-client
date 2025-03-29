@@ -126,6 +126,8 @@ export const fetchUser = async (token: string) => {
 };
 
 export const fetchUserById = async (token: string, userId:string) => {
+
+  console.log(userId, 'otheruser id')
   
   const response = await axios.get(`${BACKEND_URL}/api/${userId}`, {
     headers: {

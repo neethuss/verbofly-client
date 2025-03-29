@@ -77,6 +77,7 @@ const LanguageManagementPage = () => {
     id: string,
     action: "block" | "unblock"
   ) => {
+    console.log(action,'what is the language action')
     const data = await languageBlockUnblock(action, id, token as string);
     if (data) {
       setLanguages((prevLanguages) =>
