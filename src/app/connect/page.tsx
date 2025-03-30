@@ -153,6 +153,7 @@ const ConnectionsPage = () => {
                     <button
                       className="w-full sm:w-auto bg-yellow-400 hover:bg-yellow-500 text-black font-semibold py-2 px-4 rounded-full transition-colors duration-300 flex items-center justify-center"
                       onClick={() =>
+                        
                         router.push(`/connect/${connection?._id}`)
                       }
                     >

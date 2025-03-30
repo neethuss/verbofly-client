@@ -1,5 +1,4 @@
-
-"use client"
+"use client";
 import React, { FormEvent, ChangeEvent, useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -10,6 +9,8 @@ import { loginSchema } from "@/utils/Validation";
 import useAuthStore from "@/store/authStore";
 import axios from "axios";
 import { LoginErrors } from "@/utils/Types";
+import Image from "next/image";
+import google from '../../../../public/asset/Google-Icon.jpg'
 
 const LoginPage = () => {
   const { isAuthenticated, setUserAuth } = useAuthStore();
@@ -32,7 +33,7 @@ const LoginPage = () => {
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!email || !password) {
       setErrors({ general: "All fields must be filled out" });
       return;
@@ -77,17 +78,29 @@ const LoginPage = () => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+    window.location.href =`${BACKEND_URL}/googleauth/auth/google`
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-yellow-400">VerboFly</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-yellow-400">
+            VerboFly
+          </h1>
           <p className="mt-2 text-lg sm:text-xl">Sign in to your account</p>
         </div>
 
         <div className="bg-gray-800 rounded-lg p-6 sm:p-8">
           <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
-            {errors.general && <p className="text-red-500 text-xs sm:text-sm mb-4">{errors.general}</p>}
+            {errors.general && (
+              <p className="text-red-500 text-xs sm:text-sm mb-4">
+                {errors.general}
+              </p>
+            )}
 
             <div>
               <div className="relative">
@@ -102,7 +115,9 @@ const LoginPage = () => {
                 />
               </div>
               {errors.email && (
-                <p className="mt-1 text-red-500 text-xs sm:text-sm">{errors.email}</p>
+                <p className="mt-1 text-red-500 text-xs sm:text-sm">
+                  {errors.email}
+                </p>
               )}
             </div>
 
@@ -119,7 +134,9 @@ const LoginPage = () => {
                 />
               </div>
               {errors.password && (
-                <p className="mt-1 text-red-500 text-xs sm:text-sm">{errors.password}</p>
+                <p className="mt-1 text-red-500 text-xs sm:text-sm">
+                  {errors.password}
+                </p>
               )}
             </div>
 
@@ -144,6 +161,9 @@ const LoginPage = () => {
               </button>
             </div>
           </form>
+          <div className="flex justify-center mt-3" onClick={handleGoogleLogin}>
+            <Image src={google} width={30} height={30} alt="google" />
+          </div>
         </div>
 
         <p className="mt-6 sm:mt-8 text-center text-xs sm:text-sm text-gray-400">

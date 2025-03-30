@@ -95,8 +95,9 @@ const UserProfile: React.FC = () => {
                   <Image
                     src={user.profilePhoto}
                     alt="Profile"
-                    layout="fill"
-                    objectFit="cover"
+                    width={500} 
+                    height={500}
+                    unoptimized={true}  
                     className="rounded-full"
                   />
                 ) : (

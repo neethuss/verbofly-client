@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import React, { ChangeEvent, FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -8,6 +8,8 @@ import { SignupErrors } from "@/utils/Types";
 import { postSignup } from "@/services/userApi";
 import { signupSchema } from "@/utils/Validation";
 import { FaUser, FaEnvelope, FaLock, FaUserPlus } from "react-icons/fa";
+import google from "../../../../public/asset/Google-Icon.jpg";
+import Image from "next/image";
 
 const SignupPage = () => {
   const [username, setUsername] = useState("");
@@ -35,7 +37,7 @@ const SignupPage = () => {
     }
 
     setErrors({});
- 
+
     const validationResult = signupSchema.safeParse({
       username,
       email,
@@ -70,6 +72,12 @@ const SignupPage = () => {
     }
   };
 
+  const handleGoogleLogin = () => {
+    const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL;
+
+    window.location.href =`${BACKEND_URL}/googleauth/auth/google`
+  };
+
   return (
     <div className="min-h-screen bg-gray-900 text-white font-sans flex">
       <div className="flex-1 flex items-center justify-center">
@@ -82,9 +90,13 @@ const SignupPage = () => {
           </p>
         </div>
         <div className="w-full max-w-md p-8 bg-gray-800 rounded-lg">
-          <h2 className="text-2xl font-bold text-center mb-6 text-yellow-400">Sign Up</h2>
+          <h2 className="text-2xl font-bold text-center mb-6 text-yellow-400">
+            Sign Up
+          </h2>
           <form onSubmit={handleSubmit} className="space-y-6">
-            {errors.general && <p className="text-red-500 text-sm mb-4">{errors.general}</p>}
+            {errors.general && (
+              <p className="text-red-500 text-sm mb-4">{errors.general}</p>
+            )}
 
             <div>
               <div className="relative">
@@ -143,7 +155,9 @@ const SignupPage = () => {
                   className="w-full pl-10 pr-3 py-2 bg-gray-700 rounded-lg text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-yellow-400"
                 />
               </div>
-              <p className="text-red-500 text-xs mt-1">{errors.confirmPassword}</p>
+              <p className="text-red-500 text-xs mt-1">
+                {errors.confirmPassword}
+              </p>
             </div>
 
             <div>
@@ -159,10 +173,16 @@ const SignupPage = () => {
             <div className="text-center mt-4">
               <p className="text-gray-400 text-sm">
                 Already have an account?{" "}
-                <Link href="/login" className="text-yellow-400 hover:text-yellow-500">
+                <Link
+                  href="/login"
+                  className="text-yellow-400 hover:text-yellow-500"
+                >
                   Login
                 </Link>
               </p>
+            </div>
+            <div className="flex justify-center" onClick={handleGoogleLogin}>
+              <Image src={google} width={30} height={30} alt="google" />
             </div>
           </form>
         </div>

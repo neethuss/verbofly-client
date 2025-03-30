@@ -26,6 +26,11 @@ const CallNotification = () => {
             alt="/default-profile.jpg"
             width={20}
             height={20}
+          unoptimized={true}
+          onError={(e) => {
+            e.currentTarget.onerror = null; // Prevent infinite loop
+            e.currentTarget.src = '/default-profile.jpg';
+          }}
             className="cursor-pointer"
           />
           <h3 className=" text-white ">

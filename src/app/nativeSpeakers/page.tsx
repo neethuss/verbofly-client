@@ -46,7 +46,7 @@ interface User {
 }
 
 const Page = () => {
-  const { user,logout } = useAuthStore();
+  const { user, logout } = useAuthStore();
   const [users, setUsers] = useState<User[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [currentUser, setCurrenctUser] = useState<User>();
@@ -61,13 +61,12 @@ const Page = () => {
   const [filterLanguage, setFilterLanguage] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
   const [page, setPage] = useState<number>(1);
-  const {emitConnectionRequest, emitConnectionAccept} = useSocketStore()
+  const { emitConnectionRequest, emitConnectionAccept } = useSocketStore();
 
   const router = useRouter();
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
     const fetchCurrentUser = async () => {
-      console.log("useEffect in subscription");
       try {
         const data = await fetchUser(token as string);
         setCurrenctUser(data);
@@ -186,7 +185,11 @@ const Page = () => {
 
     switch (buttonText) {
       case "Accept":
-        emitConnectionAccept(userId,currentUser?._id as string, currentUser?.username as string)
+        emitConnectionAccept(
+          userId,
+          currentUser?._id as string,
+          currentUser?.username as string
+        );
         await acceptConnectionRequest(token as string, userId);
         setButtonStates((prev) => ({
           ...prev,
@@ -209,7 +212,11 @@ const Page = () => {
         break;
 
       case "Connect":
-        emitConnectionRequest(userId,currentUser?._id as string, currentUser?.username as string)
+        emitConnectionRequest(
+          userId,
+          currentUser?._id as string,
+          currentUser?.username as string
+        );
         await sendConnectionRequest(token as string, userId);
         setButtonStates((prev) => ({
           ...prev,
@@ -244,7 +251,9 @@ const Page = () => {
               <div className="bg-[#1e293b] p-4 rounded-lg flex items-center h-full">
                 <FaUsers className="w-8 h-8 sm:w-10 sm:h-10 mr-4" />
                 <div>
-                  <p className="text-base sm:text-lg font-semibold">Total Native Speakers</p>
+                  <p className="text-base sm:text-lg font-semibold">
+                    Total Native Speakers
+                  </p>
                   <p className="text-xl sm:text-2xl font-bold">{totalUsers}</p>
                 </div>
               </div>
@@ -307,12 +316,18 @@ const Page = () => {
                 >
                   <div className="h-40 sm:h-48 overflow-hidden">
                     <Image
-                      src={user.profilePhoto || BlankProfile.src}
+                      src={
+                        user.profilePhoto ? user.profilePhoto : BlankProfile.src
+                      }
                       alt={`${user.username}'s profile`}
                       className="w-full h-full object-cover"
                       width={500}
                       height={500}
-                      objectFit="cover"
+                      onError={(e) => {
+                        e.currentTarget.onerror = null; // Prevent infinite loop
+                        e.currentTarget.src = BlankProfile.src;
+                      }}
+                      unoptimized={true}
                     />
                   </div>
                   <div className="p-4 sm:p-6 flex-grow flex flex-col justify-between">

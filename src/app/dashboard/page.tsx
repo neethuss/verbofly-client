@@ -1,13 +1,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import {
-  FaUser,
-  FaBook,
-  FaUsers,
-  FaQuestionCircle,
-} from "react-icons/fa";
+import { redirect, useRouter } from "next/navigation";
+import { FaUser, FaBook, FaUsers, FaQuestionCircle } from "react-icons/fa";
 import { GiProgression } from "react-icons/gi";
 import { MdPayment } from "react-icons/md";
 import { IoMdChatboxes } from "react-icons/io";
@@ -16,7 +11,7 @@ import ProtectedRoute from "@/HOC/ProtectedRoute";
 import LoadingPage from "@/components/Loading";
 import Modal from "@/components/Modal";
 import Image from "next/image";
-import {fetchUser } from "@/services/userApi";
+import { fetchUser } from "@/services/userApi";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import { User } from "@/Types/chat";
@@ -30,33 +25,57 @@ interface DashboardCardProps {
 
 const Dashboard = () => {
   const [showModal, setShowModal] = useState(false);
-  const { isLoading, user, isAuthenticated, logout ,} = useAuthStore();
-  const [currentUser, setCurrentUser] = useState<User>()
+  const { isLoading, user, isAuthenticated, logout, setUserAuth } =
+    useAuthStore();
+  const [currentUser, setCurrentUser] = useState<User>();
   const router = useRouter();
-
 
   const handleOpenModal = () => setShowModal(true);
   const handleCloseModal = () => setShowModal(false);
 
-  
-
   useEffect(() => {
-    const token = localStorage.getItem("userAccessToken");
+    let token = localStorage.getItem("userAccessToken");
+    if (!isAuthenticated) {
+      console.log('forntened dashboard via google authentication')
+      const params = new URLSearchParams(window.location.search);
+       token = params.get("token");
+      console.log('params iin frintend', token)
+
+      if (token && !isAuthenticated) {
+        (async () => {
+          try {
+            window.history.replaceState({}, document.title, "/dashboard");
+            
+            const userData = await fetchUser(token);
+            
+            if (userData) {
+              setUserAuth(userData, token);
+              toast.success("Google login successful!");
+            }
+          } catch (error) {
+            console.error("Error processing Google authentication:", error);
+            toast.error("Failed to complete Google authentication");
+            logout();
+            router.push("/login");
+          }
+        })();
+      } else {
+        redirect("/login");
+      }
+    }
     const fetchCurrentUser = async () => {
-      console.log('useEffect in subscription')
       try {
         const data = await fetchUser(token as string);
-        setCurrentUser(data)
-        
+        setCurrentUser(data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              logout()
-            }else if (error.response.status === 401) {
+              logout();
+            } else if (error.response.status === 401) {
               toast.error("Token expired");
-              logout()
+              logout();
             }
           } else {
             toast.error("An unexpected error occurred in login");
@@ -66,8 +85,9 @@ const Dashboard = () => {
         }
       }
     };
+
     fetchCurrentUser();
-  }, [logout]);
+  }, [isAuthenticated, router, logout, setUserAuth]);
 
   if (isLoading) return <LoadingPage />;
   if (!isAuthenticated) {
@@ -107,8 +127,9 @@ const Dashboard = () => {
                 <Image
                   src={currentUser?.profilePhoto}
                   alt="Profile"
-                  layout="fill"
-                  objectFit="cover"
+                  width={40}  
+                  height={40}
+                  unoptimized={true}  
                 />
               ) : (
                 <div className="w-full h-full bg-gray-700 flex items-center justify-center">
@@ -129,8 +150,9 @@ const Dashboard = () => {
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between mb-4">
           <h2 className="text-3xl font-bold mb-8">Dashboard</h2>
-          <button className="border border-gray-100 rounded-2xl text-yellow-400 h-7 px-3 hover:text-black hover:bg-yellow-400 cursor-pointer hover:border-transparent"
-          onClick={()=>router.push('/translate')}
+          <button
+            className="border border-gray-100 rounded-2xl text-yellow-400 h-7 px-3 hover:text-black hover:bg-yellow-400 cursor-pointer hover:border-transparent"
+            onClick={() => router.push("/translate")}
           >
             Quick Translate
           </button>
@@ -213,4 +235,4 @@ const Dashboard = () => {
   );
 };
 
-export default ProtectedRoute(Dashboard);
+export default Dashboard;

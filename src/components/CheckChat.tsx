@@ -312,6 +312,7 @@ const CheckChat: React.FC<CheckChatProps> = ({
             alt={otherUserDetails?.username}
             width={40}
             height={40}
+            unoptimized={true}
             priority={true}
           />
 

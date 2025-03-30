@@ -86,7 +86,7 @@ const ChatPage = () => {
   const [loadingChats, setLoadingChats] = useState<boolean>(false);
 
   useEffect(() => {
-    console.log(currentUserId, "cuu");
+   
 
     const fetchUserChats = async () => {
       if (currentUserId) {
@@ -310,6 +310,7 @@ const ChatPage = () => {
                       }
                       width={40}
                       height={40}
+                      unoptimized={true}
                       alt={chatUser.otherUser.username}
                     />
                     <div className="flex-1">
