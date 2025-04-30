@@ -51,8 +51,8 @@ const GroupChatPage: React.FC = () => {
 
   useEffect(() => {
     const setupGroupChat = async () => {
-      const appID = 1753727909;
-      const serverSecret = "7ba0852a9596a5818675b80a0aa4bc7c";
+      const appID = 1386204990;
+      const serverSecret = "92daef8ad3153dc7e5d072c206ebb6d8";
 
       const kitToken = ZegoUIKitPrebuilt.generateKitTokenForTest(
         appID,
