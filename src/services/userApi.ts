@@ -47,7 +47,6 @@ export const postLogin = async (email: string, password: string) => {
     }, {
       withCredentials: true
     });
-    console.log(response.data,'post login after login in front')
     return response.data;
   
 };
@@ -55,7 +54,7 @@ export const postLogin = async (email: string, password: string) => {
 // Forgot password email submission
 export const sendForgotPasswordEmail = async (email: string) => {
   try {
-    const response = await axios.post(`${BACKEND_URL}/api/forgotPassword`, {
+    const response = await axios.post(`${BACKEND_URL}/forgotPassword`, {
       email
     });
     return response.data;
@@ -77,7 +76,7 @@ export const sendForgotPasswordEmail = async (email: string) => {
 // Verifying OTP
 export const verifyOtp = async (otpString: string, storedOtp: string) => {
   try {
-    const response = await axios.post(`${BACKEND_URL}/api/verifyOtp`, {
+    const response = await axios.post(`${BACKEND_URL}/forgotPassword/verifyOtp`, {
       otpString, storedOtp
     });
     return response.data;
@@ -101,7 +100,7 @@ export const verifyOtp = async (otpString: string, storedOtp: string) => {
 // Resetting password
 export const resetPassword = async (email: string, password: string) => {
   try {
-    const response = await axios.post(`${BACKEND_URL}/api/resetPassword`, {
+    const response = await axios.post(`${BACKEND_URL}/forgotPassword/resetPassword`, {
       email, password
     });
     return response.data;
@@ -113,8 +112,6 @@ export const resetPassword = async (email: string, password: string) => {
 
 // Fetching data for a particular user
 export const fetchUser = async (token: string) => {
-  console.log('fetching current user detail')
-  console.log(token,'what is token now')
     const response = await axios.get(`${BACKEND_URL}/api/user`, {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -126,16 +123,12 @@ export const fetchUser = async (token: string) => {
 };
 
 export const fetchUserById = async (token: string, userId:string) => {
-
-  console.log(userId, 'otheruser id')
-  
   const response = await axios.get(`${BACKEND_URL}/api/${userId}`, {
     headers: {
       Authorization: `Bearer ${token}`,
     },
     withCredentials: true,
   });
-  console.log(response.data,'fron')
   return response.data;
 
 };
@@ -151,7 +144,6 @@ export const checkBlock = async (token: string) => {
     },
     withCredentials: true,
   });
-  console.log(response.data,'fron')
   return response.data;
 
 };
@@ -160,7 +152,6 @@ export const checkBlock = async (token: string) => {
 
 //updating user details
 export const updateUser = async(token:string, user:User) => {
-  console.log(user,'user api')
   const response = await axios.patch(`${BACKEND_URL}/api/user`,
     user
   ,{
@@ -168,7 +159,6 @@ export const updateUser = async(token:string, user:User) => {
       Authorization :`Bearer ${token}`
     }
   })
-  console.log(response.data,'user api after')
   return response.data
 }
 
@@ -212,14 +202,11 @@ export const fetchUsers = async(token:string, search?: string, page?: number, li
 //User block unblock
 export const userBlockUnblock = async(action:string, id:string, token:string)=> {
   try {
-    console.log(action,'action')
-    console.log('forn')
     const response = await axios.patch(`${BACKEND_URL}/api/user/${action}/${id}`,{},{
       headers : {
         Authorization : `Bearer ${token}`
       }
     })
-    console.log(response.data.isBlocked,'wht updated')
     return response.data
   } catch (error) {
     console.log(`Error ${action}ing user`, error);
@@ -229,7 +216,6 @@ export const userBlockUnblock = async(action:string, id:string, token:string)=> 
 
 //update user lesson progress
 export const updateProgress = async(token:string, userId:string, languageId:string, lessonId?:string, isCompleted?:boolean, result?:string) => {
-  console.log(userId,languageId, result,isCompleted,lessonId, 'font')
   const response = await axios.post(`${BACKEND_URL}/api/progress`,{
     userId,languageId, isCompleted,lessonId, result
   },{
@@ -247,20 +233,17 @@ export const getLessonProgress = async(token:string, languageId:string, category
       Authorization : `Bearer ${token}`
     }
   })
-  console.log(response.data.isCompleted,'waht')
   return response.data
 }
 
 
 //user progress 
 export const getUserProgress = async(token:string) => {
-  console.log('tar lan frnt')
   const response = await axios.get(`${BACKEND_URL}/api/progress/userProgress`,{
     headers : {
       Authorization : `Bearer ${token}`
     }
   })
-  console.log(response.data,'getuserprogress')
   return response
 
 }
@@ -286,68 +269,60 @@ export const fetchNativeSpeakers = async (
 
   // Remove undefined values from params
   Object.keys(params).forEach(key => params[key] === undefined && delete params[key]);
-console.log(params,'params')
-  const response = await axios.get(`${BACKEND_URL}/api/native/speakers`, {
+  const response = await axios.get(`${BACKEND_URL}/connection/native/speakers`, {
     params,
     headers: {
       Authorization: `Bearer ${token}`,
     },
   });
-  console.log(response.data, 'froxn')
   return response.data;
 };
 
 //send connection request
 export const sendConnectionRequest = async(token:string,receiverId:string) =>{
-   const response = await axios.patch(`${BACKEND_URL}/api/sendConnection`,{
+   const response = await axios.patch(`${BACKEND_URL}/connection/sendConnection`,{
     receiverId
    },{
     headers:{
       Authorization:  `Bearer ${token}`
     }
    })
-   console.log(response.data)
    return response.data
 }
 
 //cancel connection request
 export const cancelConnectionRequest = async(token:string,cancelId:string) =>{
-  console.log('cancelling')
-  const response = await axios.patch(`${BACKEND_URL}/api/cancelConnection`,{
+  const response = await axios.patch(`${BACKEND_URL}/connection/cancelConnection`,{
     cancelId
   },{
    headers:{
      Authorization:  `Bearer ${token}`
    }
   })
-  console.log(response.data)
   return response.data
 }
 
 
 //cancel connection request
 export const rejectConnectionRequest = async(token:string,rejectId:string) =>{
-  const response = await axios.patch(`${BACKEND_URL}/api/rejectConnection`,{
+  const response = await axios.patch(`${BACKEND_URL}/connection/rejectConnection`,{
     rejectId
   },{
    headers:{
      Authorization:  `Bearer ${token}`
    }
   })
-  console.log(response.data)
   return response.data
 }
 
 //accept connection request
 export const acceptConnectionRequest = async(token:string,acceptId:string) =>{
-  console.log('going to accept',acceptId)
-  const response = await axios.patch(`${BACKEND_URL}/api/acceptConnection`,{
+  const response = await axios.patch(`${BACKEND_URL}/connection/acceptConnection`,{
     acceptId
   },{
    headers:{
      Authorization:  `Bearer ${token}`
    }
   })
-  console.log(response.data)
   return response.data
 }

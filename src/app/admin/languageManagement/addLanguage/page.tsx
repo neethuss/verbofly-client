@@ -84,7 +84,6 @@ const AddLanguagePage = () => {
       setErrors({});
     }
     try {
-      console.log("add la");
       const response = await axios.post(
         `${BACKEND_URL}/language/addLanguage`,
         { languageName, countries: selectedCountries },

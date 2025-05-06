@@ -56,7 +56,7 @@ const Page = () => {
   const [languages, setLanguages] = useState<Language[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [totalUsers, setTotalUsers] = useState<number>(1);
-  const [limit] = useState<number>(6);
+  const [limit] = useState<number>(4);
   const [filterCountry, setFilterCountry] = useState<string>("");
   const [filterLanguage, setFilterLanguage] = useState<string>("");
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -300,7 +300,7 @@ const Page = () => {
             </div>
           </div>
 
-          <div className="flex flex-wrap justify-center gap-7 sm:gap-6 mb-6 sm:mb-8">
+          <div className="flex flex-wrap justify-center gap-5 sm:gap-6 mb-6 sm:mb-8">
             {users.map((user) => {
               const { text: buttonText, color: buttonColor } = buttonStates[
                 user._id

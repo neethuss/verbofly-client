@@ -39,7 +39,6 @@ const AddCategoryPage = () => {
     }
 
     try {
-      console.log('category add akkan pohn')
       const response = await axios.post(`${BACKEND_URL}/category/addCategory`,{
         categoryName
       },{
