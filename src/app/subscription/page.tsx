@@ -32,7 +32,6 @@ function Subscription() {
       console.log('useEffect in subscription')
       try {
         const data = await fetchUser(token as string);
-        console.log(data,'what')
         setCurrentUser(data)
         setSubscribed(data.isSubscribed);
         const date = new Date(data.expirationDate);
@@ -60,7 +59,9 @@ function Subscription() {
 
   const createOrderId = async () => {
     try {
+  ;
       const response = await fetch("/api/order", {
+        
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -85,7 +86,7 @@ function Subscription() {
     try {
       const orderId: string = await createOrderId();
       const options = {
-        key: process.env.key_id,
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: 199 * 100,
         currency: currency,
         name: currentUser?.username || "User",
@@ -98,7 +99,6 @@ function Subscription() {
             razorpayOrderId: paymentresponse.razorpay_order_id,
             razorpaySignature: paymentresponse.razorpay_signature,
           };
-
           const result = await fetch("/api/verify", {
             method: "POST",
             body: JSON.stringify(data),
