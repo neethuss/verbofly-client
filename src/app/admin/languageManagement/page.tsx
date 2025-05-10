@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -27,9 +27,11 @@ interface Language {
 }
 
 const LanguageManagementPage = () => {
-  const {token, adminLogout} = useAdminAuthStore()
+  const { token, adminLogout } = useAdminAuthStore();
   const [languages, setLanguages] = useState<Language[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
+
   const [page, setPage] = useState<number>(1);
   const [totalLanguages, setTotalLanguages] = useState<number>(0);
   const [limit] = useState<number>(10);
@@ -38,46 +40,57 @@ const LanguageManagementPage = () => {
   const [currentAction, setCurrentAction] = React.useState<"block" | "unblock">(
     "block"
   );
-  const [loadingLanguage, setLoadingLanguage] = useState<boolean>(false)
+  const [loadingLanguage, setLoadingLanguage] = useState<boolean>(false);
 
   const router = useRouter();
 
   useEffect(() => {
-    const fetchLanguagesData = async () => {
-      try {
-        setLoadingLanguage(true)
-        const data = await fetchLanguages(
-          token as string,
-          searchCharacters,
-          page,
-          limit
-        );
-        if (data) {
-          setLanguages(data.languages);
-          setTotalLanguages(data.total);
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.error(
-            "Token expired or unauthorized. Redirecting to login..."
-          );
-          toast.error("Token expired...Login again!");
-          adminLogout()
-        } else {
-          console.error("Error fetching users data:", error);
-        }
-      }finally{
-        setLoadingLanguage(false)
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchCharacters);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchCharacters]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
+  const fetchLanguagesData = useCallback(async () => {
+    try {
+      setLoadingLanguage(true);
+      const data = await fetchLanguages(
+        token as string,
+        debouncedSearch,
+        page,
+        limit
+      );
+      if (data) {
+        setLanguages(data.languages);
+        setTotalLanguages(data.total);
       }
-    };
-    fetchLanguagesData();
-  }, [searchCharacters, page, limit, adminLogout, token]);
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.error("Token expired or unauthorized. Redirecting to login...");
+        toast.error("Token expired...Login again!");
+        adminLogout();
+      } else {
+        console.error("Error fetching users data:", error);
+      }
+    } finally {
+      setLoadingLanguage(false);
+    }
+  }, [debouncedSearch, page, limit, adminLogout, token]);
+
+   useEffect(() => {
+      fetchLanguagesData();
+    }, [fetchLanguagesData]);
 
   const handleBlockUnblock = async (
     id: string,
     action: "block" | "unblock"
   ) => {
-    console.log(action,'what is the language action')
+    console.log(action, "what is the language action");
     const data = await languageBlockUnblock(action, id, token as string);
     if (data) {
       setLanguages((prevLanguages) =>
@@ -118,10 +131,17 @@ const LanguageManagementPage = () => {
     setShowModal(false);
   };
 
-  if(loadingLanguage){
-    return <LoadingPage/>
-  }
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchCharacters(e.target.value);
+  };
 
+  if (loadingLanguage) {
+    return (
+      <AdminLayout>
+        <LoadingPage />
+      </AdminLayout>
+    );
+  }
   return (
     <div className="flex flex-col min-h-screen font-sans">
       <AdminLayout>
@@ -136,7 +156,8 @@ const LanguageManagementPage = () => {
                   type="text"
                   placeholder="Search language..."
                   value={searchCharacters}
-                  onChange={(e) => setSearchCharacters(e.target.value)}
+                  onChange={handleSearchChange}
+                  autoFocus={searchCharacters.length > 0}
                   className="px-4 py-2 rounded border-none bg-gray-800 text-white w-full sm:w-auto"
                 />
 
@@ -184,7 +205,7 @@ const LanguageManagementPage = () => {
                         )}
                       </td>
                       <td className="px-4 py-2 text-white">
-                      <div className="flex justify-center gap-3">
+                        <div className="flex justify-center gap-3">
                           <CiEdit
                             className=" text-blue-800 cursor-pointer"
                             onClick={() => handleEdit(language._id)}

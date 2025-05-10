@@ -28,7 +28,7 @@ interface Language {
 }
 
 const EditLanguagePage = () => {
-  const {token, adminLogout} = useAdminAuthStore()
+  const {token} = useAdminAuthStore()
   const [language, setLanguage] = useState<Language | null>(null);
   const [countries, setCountries] = useState<Country[]>([]);
   const [selectedCountries, setSelectedCountries] = useState<string[]>([]);
@@ -52,7 +52,7 @@ const EditLanguagePage = () => {
         if (response.status === 200) {
           setLanguage(response.data);
           setSelectedCountries(
-            response.data.countries.map((country: Country) => country._id)
+            response.data.countries
           );
         }
 
@@ -66,7 +66,6 @@ const EditLanguagePage = () => {
           }
         );
 
-        console.log(countriesResponse, "wht ");
         if (countriesResponse.status === 200) {
           const notBlockedCountries = countriesResponse.data.countries.filter((country:Country)=>!country.isBlocked)
           setCountries(notBlockedCountries);
@@ -81,6 +80,9 @@ const EditLanguagePage = () => {
 
     fetchLanguage();
   }, [editLanguage, token]);
+  useEffect(()=>{
+    console.log(selectedCountries,'countries')
+  })
 
   const handleGoBack = () => {
     router.back();

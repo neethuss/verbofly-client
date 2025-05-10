@@ -40,7 +40,7 @@ interface INewQuestion {
 }
 
 const EditQuizPage = () => {
-  const { token, adminLogout } = useAdminAuthStore();
+  const { token } = useAdminAuthStore();
   const [name, setName] = useState<string>("");
 
   const [showModal, setShowModal] = useState<boolean>(false);
@@ -231,7 +231,6 @@ const EditQuizPage = () => {
 
   const handleEditQuiz = async () => {
     try {
-      console.log("handleAddQuiz");
       const response = await editQuizById(
         token as string,
         editQuiz,
@@ -240,11 +239,12 @@ const EditQuizPage = () => {
         selectedCategory?.value as string,
         questions
       );
+      console.log(response,'response')
       if (response.status === 200) {
         toast.success("Quiz updated successfully");
         router.push("/admin/quizManagement");
       } else if (response.status === 409) {
-        toast.warning(
+        toast.warn(
           `Quiz already existing in the selected category in selected language`
         );
       }

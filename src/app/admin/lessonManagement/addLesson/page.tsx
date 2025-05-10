@@ -141,8 +141,8 @@ const AddLessonPage = () => {
 
     try {
       setLoadingAddLesson(true)
-      console.log(formData, 'form data in add lesson')
       const response = await addLesson(token as string, formData);
+      console.log(response,'res')
       if (response.status === 201) {
         toast.success("Lesson added successfully!");
         router.push("/admin/lessonManagement");

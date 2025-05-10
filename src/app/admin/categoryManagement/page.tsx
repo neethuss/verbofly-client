@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -21,9 +21,10 @@ interface Category {
 }
 
 const CategoryManagementPage = () => {
-  const {token} = useAdminAuthStore()
+  const { token } = useAdminAuthStore();
   const [categories, setCategories] = useState<Category[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [totalCategories, setTotalCategories] = useState<number>(0);
   const [limit] = useState<number>(10);
@@ -32,42 +33,53 @@ const CategoryManagementPage = () => {
   const [currentAction, setCurrentAction] = React.useState<"block" | "unblock">(
     "block"
   );
-  const [loadingCategories, setLoadingCategories] = useState<boolean>(false)
+  const [loadingCategories, setLoadingCategories] = useState<boolean>(false);
 
   const router = useRouter();
 
   useEffect(() => {
-    const fetchCategoriesData = async () => {
-      try {
-        setLoadingCategories(true)
-        const data = await fetchCategories(
-          token as string,
-          searchCharacters,
-          page,
-          limit
-        );
-        if (data) {
-          setCategories(data.categories);
-          setTotalCategories(data.total);
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.error(
-            "Token expired or unauthorized. Redirecting to login..."
-          );
-          localStorage.removeItem("adminAccessToken");
-          localStorage.removeItem("admin");
-          toast.error("Token expired...Login again!");
-          router.push("/admin");
-        } else {
-          console.error("Error fetching category data:", error);
-        }
-      }finally{
-        setLoadingCategories(false)
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchCharacters);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchCharacters]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
+  const fetchCategoriesData = useCallback(async () => {
+    try {
+      setLoadingCategories(true);
+      const data = await fetchCategories(
+        token as string,
+        debouncedSearch,
+        page,
+        limit
+      );
+      if (data) {
+        setCategories(data.categories);
+        setTotalCategories(data.total);
       }
-    };
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.error("Token expired or unauthorized. Redirecting to login...");
+        localStorage.removeItem("adminAccessToken");
+        localStorage.removeItem("admin");
+        toast.error("Token expired...Login again!");
+        router.push("/admin");
+      } else {
+        console.error("Error fetching category data:", error);
+      }
+    } finally {
+      setLoadingCategories(false);
+    }
+  }, [debouncedSearch, page, limit, router, token]);
+
+  useEffect(() => {
     fetchCategoriesData();
-  }, [searchCharacters, page, limit, router, token]);
+  }, [fetchCategoriesData]);
 
   const handleBlockUnblock = async (
     id: string,
@@ -114,10 +126,17 @@ const CategoryManagementPage = () => {
     setShowModal(false);
   };
 
-  if(loadingCategories){
-    return <LoadingPage/>
-  }
-
+   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchCharacters(e.target.value);
+    };
+  
+    if (loadingCategories) {
+      return (
+        <AdminLayout>
+          <LoadingPage />
+        </AdminLayout>
+      );
+    }
   return (
     <div className="flex flex-col min-h-screen font-sans">
       <AdminLayout>
@@ -132,7 +151,8 @@ const CategoryManagementPage = () => {
                   type="text"
                   placeholder="Search category..."
                   value={searchCharacters}
-                  onChange={(e) => setSearchCharacters(e.target.value)}
+                  onChange={handleSearchChange}
+                  autoFocus={searchCharacters.length > 0}
                   className="px-4 py-2 rounded border-none bg-gray-800 text-white w-full sm:w-auto"
                 />
 

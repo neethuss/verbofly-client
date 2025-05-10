@@ -7,12 +7,11 @@ import axios from "axios";
 import { useParams, useRouter } from "next/navigation";
 import AdminProtedctedRoute from "@/HOC/AdminProtectedRoute";
 import Select from "react-select";
-import { LanguageErrors, LessonErrors } from "@/utils/Types";
+import { LessonErrors } from "@/utils/Types";
 import { editALesson, fetchLesson } from "@/services/lessonApi";
 import { fetchLanguages } from "@/services/languageApi";
 import { fetchCategories } from "@/services/categoryApi";
 import { X } from "lucide-react";
-import { lessonSchema } from "@/utils/Validation";
 import useAdminAuthStore from "@/store/adminAuthStore";
 
 interface Country {
@@ -43,7 +42,7 @@ interface Lesson {
 }
 
 const EditLessonPage = () => {
-  const {token, adminLogout} = useAdminAuthStore()
+  const { token, adminLogout } = useAdminAuthStore();
   const [title, setTitle] = useState<string>("");
   const [description, setDescription] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -61,7 +60,6 @@ const EditLessonPage = () => {
   const [errors, setErrors] = useState<LessonErrors>({});
   const [videoPreviewUrl, setVideoPreviewUrl] = useState<string | null>(null);
   const [hasExistingVideo, setHasExistingVideo] = useState<boolean>(false);
-
 
   const router = useRouter();
   const { editLesson } = useParams() as { editLesson: string };
@@ -106,34 +104,26 @@ const EditLessonPage = () => {
 
   const handleEdit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    
+
     if (!title || !description || !selectedLanguage || !selectedCategory) {
       setErrors({ general: "Required fields must be filled out" });
       return;
     }
-    
+
     setErrors({});
-    
+
     const formData = new FormData();
-  formData.append("title", title);
-  formData.append("description", description);
-  formData.append("languageName", selectedLanguage?.value || "");
-  formData.append("categoryName", selectedCategory?.value || "");
-  
-  if (selectedFile) {
-    formData.append("file", selectedFile);
-  }
-  
-  // Alternative way to log FormData without for...of
-  console.log('FormData contents:');
-  console.log('title:', formData.get('title'));
-  console.log('description:', formData.get('description'));
-  console.log('languageName:', formData.get('languageName'));
-  console.log('categoryName:', formData.get('categoryName'));
-  console.log('file:', formData.get('file'));
-    
+    formData.append("title", title);
+    formData.append("description", description);
+    formData.append("languageName", selectedLanguage?.value || "");
+    formData.append("categoryName", selectedCategory?.value || "");
+
+    if (selectedFile) {
+      formData.append("file", selectedFile);
+    }
+
     try {
-      console.log(formData, 'data')
+      console.log(formData, "data");
       const response = await editALesson(token as string, editLesson, formData);
       if (response.status === 200) {
         toast.success("Lesson edited successfully!");
@@ -258,13 +248,13 @@ const EditLessonPage = () => {
                   )}
                 </div>
                 {!hasExistingVideo && (
-        <input
-          type="file"
-          accept="video/*"
-          onChange={handleFileInput}
-          className="mb-4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 w-full"
-        />
-      )}
+                  <input
+                    type="file"
+                    accept="video/*"
+                    onChange={handleFileInput}
+                    className="mb-4 px-4 py-2 rounded border border-gray-300 focus:outline-none focus:border-blue-500 w-full"
+                  />
+                )}
                 {errors.content && (
                   <p className="mt-1 text-red-500 text-sm">{errors.content}</p>
                 )}
@@ -273,7 +263,7 @@ const EditLessonPage = () => {
                     className="px-4 py-1 rounded-2xl bg-blue-900 text-white hover:bg-blue-950"
                     type="submit"
                   >
-                    Add
+                    Edit
                   </button>
                 </div>
               </form>

@@ -27,9 +27,9 @@ function Subscription() {
   const router = useRouter();
 
   useEffect(() => {
+    console.log('subscription page')
     const token = localStorage.getItem("userAccessToken");
     const fetchCurrentUser = async () => {
-      console.log('useEffect in subscription')
       try {
         const data = await fetchUser(token as string);
         setCurrentUser(data)
@@ -59,9 +59,8 @@ function Subscription() {
 
   const createOrderId = async () => {
     try {
-  ;
+      console.log('going to crete order id in subscription page')
       const response = await fetch("/api/order", {
-        
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -99,6 +98,8 @@ function Subscription() {
             razorpayOrderId: paymentresponse.razorpay_order_id,
             razorpaySignature: paymentresponse.razorpay_signature,
           };
+          console.log(data,'data in subscription page after the order api')
+
           const result = await fetch("/api/verify", {
             method: "POST",
             body: JSON.stringify(data),
@@ -142,7 +143,6 @@ function Subscription() {
                 position: "top-center",
               });
             }
-            console.log("sdsdsd");
           } else {
             alert(res.message);
           }

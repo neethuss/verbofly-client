@@ -103,13 +103,7 @@ const AdminDashboard = () => {
   return (
     <AdminLayout>
       <div className="min-h-screen bg-gray-900 p-4 sm:p-6 text-white font-sans">
-        <div className="mb-6">
-          <input
-            type="text"
-            placeholder="Search here..."
-            className="w-full p-2 sm:p-3 rounded-lg bg-[#1e293b] text-white placeholder-gray-400"
-          />
-        </div>
+        
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mb-6">
           <div className="col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">

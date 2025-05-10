@@ -149,7 +149,7 @@ const Dashboard = () => {
 
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="flex justify-between mb-4">
-          <h2 className="text-3xl font-bold mb-8">Dashboard</h2>
+          <h2 className="text-3xl font-bold mb-8">Dashboard </h2>
           <button
             className="border border-gray-100 rounded-2xl text-yellow-400 h-7 px-3 hover:text-black hover:bg-yellow-400 cursor-pointer hover:border-transparent"
             onClick={() => router.push("/translate")}

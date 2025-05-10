@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -21,9 +21,10 @@ interface Country {
 }
 
 const CountryManagementPage = () => {
-  const {token, adminLogout} = useAdminAuthStore()
+  const { token, adminLogout } = useAdminAuthStore();
   const [countries, setCountries] = useState<Country[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
+  const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [totalCountries, setTotalCountries] = useState<number>(0);
   const [limit] = useState<number>(10);
@@ -32,40 +33,51 @@ const CountryManagementPage = () => {
   const [currentAction, setCurrentAction] = React.useState<"block" | "unblock">(
     "block"
   );
-  const [loadingCountries, setLoadingCountries] = useState<boolean>(false)
+  const [loadingCountries, setLoadingCountries] = useState<boolean>(false);
 
   const router = useRouter();
 
   useEffect(() => {
-    const fetchCountriesData = async () => {
-      try {
-        setLoadingCountries(true)
-        const data = await fetchCountries(
-          token as string,
-          searchCharacters,
-          page,
-          limit
-        );
-        if (data) {
-          setCountries(data.countries);
-          setTotalCountries(data.total);
-        }
-      } catch (error) {
-        if (axios.isAxiosError(error) && error.response?.status === 401) {
-          console.error(
-            "Token expired or unauthorized. Redirecting to login..."
-          );
-          toast.error("Token expired...Login again!");
-          adminLogout()
-        } else {
-          console.error("Error fetching users data:", error);
-        }
-      }finally{
-        setLoadingCountries(false)
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchCharacters);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchCharacters]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
+
+  const fetchCountriesData = useCallback(async () => {
+    try {
+      setLoadingCountries(true);
+      const data = await fetchCountries(
+        token as string,
+        debouncedSearch,
+        page,
+        limit
+      );
+      if (data) {
+        setCountries(data.countries);
+        setTotalCountries(data.total);
       }
-    };
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        console.error("Token expired or unauthorized. Redirecting to login...");
+        toast.error("Token expired...Login again!");
+        adminLogout();
+      } else {
+        console.error("Error fetching users data:", error);
+      }
+    } finally {
+      setLoadingCountries(false);
+    }
+  }, [debouncedSearch, page, limit, adminLogout, token]);
+
+  useEffect(() => {
     fetchCountriesData();
-  }, [searchCharacters, page, limit, adminLogout, token]);
+  }, [fetchCountriesData]);
 
   const handleBlockUnblock = async (
     id: string,
@@ -112,8 +124,16 @@ const CountryManagementPage = () => {
     setShowModal(false);
   };
 
-  if(loadingCountries){
-    return <LoadingPage/>
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchCharacters(e.target.value);
+    };
+
+  if (loadingCountries) {
+    return (
+      <AdminLayout>
+              <LoadingPage />
+            </AdminLayout>
+    )
   }
 
   return (
@@ -131,7 +151,8 @@ const CountryManagementPage = () => {
                   type="text"
                   placeholder="Search country..."
                   value={searchCharacters}
-                  onChange={(e) => setSearchCharacters(e.target.value)}
+                  onChange={handleSearchChange}
+                  autoFocus={searchCharacters.length > 0}
                   className="px-4 py-2 rounded border-none bg-gray-800 text-white w-full sm:w-auto"
                 />
 
@@ -162,7 +183,7 @@ const CountryManagementPage = () => {
                           country.countryName.slice(1)}
                       </td>
                       <td className="px-4 py-2 text-white">
-                      <div className="flex justify-center gap-3">
+                        <div className="flex justify-center gap-3">
                           <CiEdit
                             className=" text-blue-800 cursor-pointer"
                             onClick={() => handleEdit(country._id)}

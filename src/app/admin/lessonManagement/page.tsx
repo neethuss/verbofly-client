@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import AdminLayout from "@/components/AdminLayout";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
@@ -39,6 +39,7 @@ const LessonManagementPage = () => {
   const { token, adminLogout } = useAdminAuthStore();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [searchCharacters, setSearchCharacters] = useState<string>("");
+    const [debouncedSearch, setDebouncedSearch] = useState<string>("");
   const [page, setPage] = useState<number>(1);
   const [totalLessons, setTotalLessons] = useState<number>(0);
   const [limit] = useState<number>(5);
@@ -52,12 +53,24 @@ const LessonManagementPage = () => {
   const router = useRouter();
 
   useEffect(() => {
-    const fetchLessonsData = async () => {
+      const timer = setTimeout(() => {
+        setDebouncedSearch(searchCharacters);
+      }, 300);
+  
+      return () => clearTimeout(timer);
+    }, [searchCharacters]);
+  
+    useEffect(() => {
+      setPage(1);
+    }, [debouncedSearch]);
+
+  
+    const fetchLessonsData = useCallback(async () => {
       try {
         setLoadingLessons(true);
         const data = await fetchLessons(
           token as string,
-          searchCharacters,
+          debouncedSearch,
           page,
           limit
         );
@@ -82,9 +95,11 @@ const LessonManagementPage = () => {
       } finally {
         setLoadingLessons(false);
       }
-    };
-    fetchLessonsData();
-  }, [searchCharacters, page, limit, adminLogout, token]);
+    },[debouncedSearch, page, limit, adminLogout, token])
+     
+     useEffect(() => {
+        fetchLessonsData();
+      }, [fetchLessonsData]);
 
   const handleBlockUnblock = async (
     id: string,
@@ -131,9 +146,18 @@ const LessonManagementPage = () => {
     setShowModal(false);
   };
 
-  if (loadingLessons) {
-    return <LoadingPage />;
-  }
+   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchCharacters(e.target.value);
+    };
+  
+    if (loadingLessons) {
+      return (
+        <AdminLayout>
+          <LoadingPage />
+        </AdminLayout>
+      );
+    }
+  
 
   return (
     <div className="flex flex-col min-h-screen font-sans">
@@ -149,7 +173,8 @@ const LessonManagementPage = () => {
                   type="text"
                   placeholder="Search lesson by name..."
                   value={searchCharacters}
-                  onChange={(e) => setSearchCharacters(e.target.value)}
+                  onChange={handleSearchChange}
+                  autoFocus={searchCharacters.length > 0}
                   className="px-4 py-2 rounded border-none bg-gray-800 text-white w-full sm:w-auto"
                 />
 

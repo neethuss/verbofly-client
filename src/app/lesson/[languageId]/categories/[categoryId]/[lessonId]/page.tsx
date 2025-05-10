@@ -31,7 +31,6 @@ const VideoLessonPage = () => {
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
     const fetchCurrentUser = async () => {
-      console.log('useEffect in subscription')
       try {
         const data = await fetchUser(token as string);
         setCurrentUser(data)
