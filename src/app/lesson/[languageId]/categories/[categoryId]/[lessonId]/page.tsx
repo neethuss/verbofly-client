@@ -37,10 +37,7 @@ const VideoLessonPage = () => {
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
-            if (error.response.status === 403) {
-              toast.error("User is blocked");
-              logout();
-            } else if (error.response.status === 401) {
+             if (error.response.status === 401) {
               toast.error("Token expired");
               logout();
             }
