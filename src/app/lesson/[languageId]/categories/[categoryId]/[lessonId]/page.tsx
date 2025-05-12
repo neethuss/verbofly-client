@@ -83,9 +83,6 @@ const VideoLessonPage = () => {
             localStorage.removeItem("user");
             toast.error("Session expired. Please log in again.");
             router.push("/login");
-          } else if (status === 403) {
-            toast.error("Subscription required to access this quiz.");
-            router.push("/subscription");
           } else if (status === 404) {
             console.log("no progress until now");
           } else {
