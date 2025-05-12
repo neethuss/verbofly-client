@@ -76,7 +76,7 @@ const VideoLessonPage = () => {
           toast.error("Subscription required to access this lesson.");
           router.push("/subscription");
         }
-        if (axios.isAxiosError(error)) {
+        else if (axios.isAxiosError(error)) {
           const status = error.response?.status;
           if (status === 401) {
             localStorage.removeItem("userAccessToken");
