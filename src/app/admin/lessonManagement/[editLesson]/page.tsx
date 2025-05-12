@@ -64,6 +64,8 @@ const EditLessonPage = () => {
   const router = useRouter();
   const { editLesson } = useParams() as { editLesson: string };
 
+  const contentUrl = process.env.NEXT_PUBLIC_CONTENT_URL
+
   useEffect(() => {
     const fetchLessonData = async () => {
       try {
@@ -73,7 +75,7 @@ const EditLessonPage = () => {
         setTitle(data.title);
         setDescription(data.description);
         if (data.content) {
-          setVideoPreviewUrl(data.content);
+          setVideoPreviewUrl(contentUrl+data.content);
           setHasExistingVideo(true);
         }
         setSelectedLanguage({
@@ -100,7 +102,7 @@ const EditLessonPage = () => {
     };
 
     fetchLessonData();
-  }, [editLesson, token]);
+  }, [editLesson, token, contentUrl]);
 
   const handleEdit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();

@@ -48,6 +48,7 @@ const CategoryPage = () => {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
+              logout()
             }else if (error.response.status === 401) {
               toast.error("Token expired");
               logout()
@@ -112,7 +113,7 @@ const CategoryPage = () => {
   };
 
   const isLocked = (categoryName: string) => {
-    return !subscribed;
+    return categoryName.toLowerCase() !== 'beginner' && !subscribed;
   };
 
   if (loadingCategories) {

@@ -282,19 +282,19 @@ const Page = () => {
               <h3 className="text-xl font-semibold mb-2">Language Details</h3>
               <p>
                 <strong>Native:</strong>{" "}
-                {currentUser?.nativeLanguage?.languageName}
+                {currentUser?.nativeLanguage?.languageName || 'NA'} 
               </p>
               <p>
                 <strong>Known:</strong>{" "}
                 {currentUser?.knownLanguages
                   .map((lang) => lang.languageName)
-                  .join(", ")}
+                  .join(", ") || 'NA'}
               </p>
               <p>
                 <strong>Learning:</strong>{" "}
                 {currentUser?.languagesToLearn
                   .map((lang) => lang.languageName)
-                  .join(", ")}
+                  .join(", ") || 'NA'}
               </p>
             </div>
 
@@ -304,7 +304,7 @@ const Page = () => {
                 Profile Information
               </h3>
               <p>
-                <strong>Country:</strong> {currentUser?.country?.countryName}
+                <strong>Country:</strong> {currentUser?.country?.countryName || 'NA'}
               </p>
               <p
                 onClick={handleOpenModal}
@@ -313,7 +313,6 @@ const Page = () => {
                 <strong>Connections:</strong> {currentUser?.connections.length}
               </p>
               <p>
-                <strong>Email:</strong> {currentUser?.email}
               </p>
             </div>
           </div>

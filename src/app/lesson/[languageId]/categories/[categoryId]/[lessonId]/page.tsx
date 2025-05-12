@@ -27,6 +27,7 @@ const VideoLessonPage = () => {
   const [isCompleted, setIsCompleted] = useState(false);
   const { lessonId } = useParams();
   const router = useRouter();
+  const contentUrl = process.env.NEXT_PUBLIC_CONTENT_URL
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
@@ -148,7 +149,7 @@ const VideoLessonPage = () => {
             <video
               className="w-full h-full object-contain"
               controls
-              src={lesson.content}
+              src={contentUrl+lesson.content}
             >
               Your browser does not support the video tag.
             </video>

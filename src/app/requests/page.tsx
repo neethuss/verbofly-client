@@ -8,6 +8,7 @@ import {
   cancelConnectionRequest,
   fetchUser,
   rejectConnectionRequest,
+  sendConnectionRequest,
 } from "../../services/userApi";
 import UserNav from "@/components/UserNav";
 import ProtectedRoute from "@/HOC/ProtectedRoute";
@@ -39,6 +40,8 @@ interface User {
   knownLanguage: Language[];
   languagesToLearn: Language[];
   receivedRequests: User[];
+  sentRequests: string[];
+  connections: string[];
 }
 
 const IncomingRequestsPage = () => {
@@ -78,10 +81,8 @@ const IncomingRequestsPage = () => {
         > = {};
 
         data.receivedRequests.forEach((request: User) => {
-          console.log(request, "req");
           const isConnected = data.connections.includes(request._id);
           const hasSentRequest = data.sentRequests.includes(request._id);
-          console.log(isConnected, hasSentRequest, "check");
 
           let buttonText = "Connect";
           let buttonColor = "bg-yellow-400 hover:bg-yellow-500 text-black";
@@ -131,36 +132,70 @@ const IncomingRequestsPage = () => {
   const handleClick = async (buttonText: string, requestId: string) => {
     const token = localStorage.getItem("userAccessToken");
 
-    switch (buttonText) {
-      case "Accept":
-        emitConnectionAccept(
-          requestId,
-          user?._id as string,
-          user?.username as string
-        );
-        await acceptConnectionRequest(token as string, requestId);
-        setButtonStates((prev) => ({
-          ...prev,
-          [requestId]: {
-            text: "Message",
-            color: "bg-yellow-400 hover:bg-yellow-500 text-black",
-          },
-        }));
-        break;
+    try {
+      switch (buttonText) {
+        case "Accept":
+          emitConnectionAccept(
+            requestId,
+            user?._id as string,
+            user?.username as string
+          );
+          await acceptConnectionRequest(token as string, requestId);
+          setButtonStates((prev) => ({
+            ...prev,
+            [requestId]: {
+              text: "Message",
+              color: "bg-yellow-400 hover:bg-yellow-500 text-black",
+            },
+          }));
+          break;
 
-      case "Reject":
-        await rejectConnectionRequest(token as string, requestId);
-        setButtonStates((prev) => ({
-          ...prev,
-          [requestId]: {
-            text: "Connect",
-            color: "bg-yellow-400 hover:bg-yellow-500 text-black",
-          },
-        }));
-        break;
+        case "Reject":
+          await rejectConnectionRequest(token as string, requestId);
+          setButtonStates((prev) => ({
+            ...prev,
+            [requestId]: {
+              text: "Connect",
+              color: "bg-yellow-400 hover:bg-yellow-500 text-black",
+            },
+          }));
+          break;
 
-      default:
-        break;
+        case "Connect":
+          // Send connection request
+          emitConnectionRequest(
+            requestId, 
+            user?._id as string, 
+            user?.username as string
+          );
+          await sendConnectionRequest(token as string, requestId);
+          setButtonStates((prev) => ({
+            ...prev,
+            [requestId]: {
+              text: "Cancel request",
+              color: "bg-red-500 hover:bg-red-600 text-white",
+            },
+          }));
+          break;
+
+        case "Cancel request":
+          // Cancel connection request
+          await cancelConnectionRequest(token as string, requestId);
+          setButtonStates((prev) => ({
+            ...prev,
+            [requestId]: {
+              text: "Connect",
+              color: "bg-yellow-400 hover:bg-yellow-500 text-black",
+            },
+          }));
+          break;
+
+        default:
+          break;
+      }
+    } catch (error) {
+      console.error("Error handling connection request:", error);
+      toast.error("An error occurred while processing the request");
     }
   };
 
