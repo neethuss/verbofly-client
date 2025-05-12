@@ -92,7 +92,7 @@ const QuizLanguagePage = () => {
   };
 
   const isLocked = (categoryName: string) => {
-    return categoryName.toLowerCase() !== 'beginner' && !subscribed;
+    return !subscribed;
   };
 
   const getCategoryIcon = (categoryName: string) => {

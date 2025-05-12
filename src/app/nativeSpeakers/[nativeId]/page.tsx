@@ -11,19 +11,17 @@ import {
   rejectConnectionRequest,
   sendConnectionRequest,
 } from "@/services/userApi";
-import BlankProfile from "../../../../public/asset/blankprofilpicture.webp";
 import UserNav from "@/components/UserNav";
 import ProtectedRoute from "@/HOC/ProtectedRoute";
 import useAuthStore from "@/store/authStore";
 import { FaUsers } from "react-icons/fa";
 import { GiProgression } from "react-icons/gi";
-import { CiSquareQuestion } from "react-icons/ci";
 import axios from "axios";
 import { toast } from "react-toastify";
 import Image from "next/image";
-import { reject } from "lodash";
 import { useSocketStore } from "@/store/socketStore";
 import LoadingPage from "@/components/Loading";
+import { FaUser } from "react-icons/fa6";
 
 interface Country {
   countryName: string;
@@ -54,11 +52,12 @@ const Page = () => {
   const [currentUser, setCurrentUser] = useState<User>();
   const [connectionStatus, setConnectionStatus] = useState<string>("Connect");
   const [showAcceptReject, setShowAcceptReject] = useState<boolean>(false);
+  const [isConnected, setIsConnected] = useState<boolean>(false);
   const [showModal, setShowModal] = useState<boolean>(false);
-  const [loadingUser, setLoadingUser] = useState<boolean>(false)
+  const [loadingUser, setLoadingUser] = useState<boolean>(false);
 
   const { logout, user } = useAuthStore();
-  const {emitConnectionAccept, emitConnectionRequest} = useSocketStore()
+  const { emitConnectionAccept, emitConnectionRequest } = useSocketStore();
   const { nativeId } = useParams();
   const router = useRouter();
 
@@ -102,10 +101,10 @@ const Page = () => {
     const userId = user?._id;
     const fetchUserData = async () => {
       try {
-        setLoadingUser(true)
+        setLoadingUser(true);
         const data = await fetchUserById(token as string, nativeId as string);
         setCurrentUser(data.nativeUser);
-        const isConnected = data.nativeUser.connections.some(
+        const connected = data.nativeUser.connections.some(
           (connection: User) => connection._id === userId
         );
         const hasSentRequest = data.nativeUser.sentRequests.some(
@@ -115,8 +114,10 @@ const Page = () => {
           (request: User) => request._id === userId
         );
 
-        if (isConnected) {
-          setConnectionStatus("");
+        setIsConnected(connected);
+        
+        if (connected) {
+          setConnectionStatus("Chat");
           setShowAcceptReject(false);
         } else if (hasSentRequest) {
           setConnectionStatus("Accept");
@@ -130,8 +131,8 @@ const Page = () => {
         }
       } catch (error) {
         console.error("Failed to fetch user data:", error);
-      }finally{
-        setLoadingUser(false)
+      } finally {
+        setLoadingUser(false);
       }
     };
 
@@ -148,14 +149,24 @@ const Page = () => {
     const token = localStorage.getItem("userAccessToken");
     const userId = currentUser?._id as string;
 
+    if (action === "Chat") {
+      router.push(`/connect/${userId}`);
+      return;
+    }
+
     try {
-      setLoadingUser(true)
+      setLoadingUser(true);
       switch (action) {
         case "Accept":
-          emitConnectionAccept(currentUser?._id as string, userNow?._id as string, userNow?.username as string)
+          emitConnectionAccept(
+            currentUser?._id as string,
+            userNow?._id as string,
+            userNow?.username as string
+          );
           await acceptConnectionRequest(token as string, userId);
-          setConnectionStatus("");
+          setConnectionStatus("Chat");
           setShowAcceptReject(false);
+          setIsConnected(true);
           break;
         case "Reject":
           await rejectConnectionRequest(token as string, userId);
@@ -168,7 +179,11 @@ const Page = () => {
           setShowAcceptReject(false);
           break;
         case "Connect":
-          emitConnectionRequest(currentUser?._id as string, userNow?._id as string, userNow?.username as string)
+          emitConnectionRequest(
+            currentUser?._id as string,
+            userNow?._id as string,
+            userNow?.username as string
+          );
           await sendConnectionRequest(token as string, userId);
           setConnectionStatus("Cancel Request");
           setShowAcceptReject(false);
@@ -179,8 +194,8 @@ const Page = () => {
     } catch (error) {
       console.error("Error handling connection action:", error);
       toast.error("Failed to perform action. Please try again.");
-    }finally{
-      setLoadingUser(false)
+    } finally {
+      setLoadingUser(false);
     }
   };
 
@@ -189,8 +204,8 @@ const Page = () => {
     return string.charAt(0).toUpperCase() + string.slice(1);
   };
 
-  if(loadingUser){
-    return <LoadingPage/>
+  if (loadingUser) {
+    return <LoadingPage />;
   }
 
   return (
@@ -205,14 +220,21 @@ const Page = () => {
         <h1 className="text-4xl font-bold mb-8">User Profile</h1>
         <div className="bg-gray-800 rounded-lg p-8 w-full max-w-4xl shadow-lg">
           <div className="flex flex-col md:flex-row items-center space-y-6 md:space-y-0 md:space-x-8">
-            <Image
-              src={currentUser?.profilePhoto || BlankProfile.src}
-              alt="User Profile"
-              className="rounded-full border-4 border-yellow-400"
-              width={128}
-              height={128}
-              objectFit="cover"
-            />
+            {currentUser?.profilePhoto ? (
+              <Image
+                src={currentUser?.profilePhoto}
+                alt="User Profile"
+                className="w-32 h-32 object-cover rounded-full border-4 border-yellow-400"
+                width={128}
+                height={128}
+                unoptimized={true}
+              />
+            ) : (
+              <div className="flex items-center justify-center h-full w-full">
+                <FaUser size={64} className="text-gray-400" />
+              </div>
+            )}
+
             <div className="flex-grow text-center md:text-left">
               <h2 className="text-3xl font-bold text-yellow-400">
                 {capitalizeFirstLetter(currentUser?.username || "")}
@@ -243,6 +265,8 @@ const Page = () => {
                       ? "bg-yellow-400 hover:bg-yellow-500 text-black"
                       : connectionStatus === "Cancel Request"
                       ? "bg-red-500 hover:bg-red-600 text-white"
+                      : connectionStatus === "Chat" 
+                      ? "bg-blue-500 hover:bg-blue-600 text-white"
                       : "bg-blue-500 hover:bg-blue-600 text-white"
                   }`}
                 >

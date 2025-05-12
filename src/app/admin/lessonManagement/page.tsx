@@ -193,7 +193,7 @@ const LessonManagementPage = () => {
                   <tr className="border-b border-gray-100 bg-gray-500">
                     <th className="py-2 px-4 text-white">Title</th>
                     <th className="py-2 px-4 text-white">Description</th>
-                    <th className="py-2 px-4 text-white">Content</th>
+                 
                     <th className="py-2 px-4 text-white">Category</th>
                     <th className="py-2 px-4 text-white">Language</th>
                     <th className="py-2 px-4 text-white">Action</th>
@@ -212,7 +212,6 @@ const LessonManagementPage = () => {
                       <td className="px-4 py-2 text-white">
                         {lesson.description}
                       </td>
-                      <td className="px-4 py-2 text-white">{lesson.content}</td>
                       <td className="px-4 py-2 text-white">
                         {lesson.categoryName.categoryName
                           .charAt(0)

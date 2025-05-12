@@ -8,10 +8,11 @@ import { useRouter } from "next/navigation";
 import AdminProtedctedRoute from "@/HOC/AdminProtectedRoute";
 import { fetchLessons, lessonBlockUnblock } from "@/services/lessonApi";
 import Modal from "@/components/Modal";
-import { fetchQuizzes } from "@/services/quizApi";
+import { deleteQuizById, fetchQuizzes } from "@/services/quizApi";
 import useAdminAuthStore from "@/store/adminAuthStore";
 import LoadingPage from "@/components/Loading";
 import { CiEdit } from "react-icons/ci";
+import { MdDelete } from "react-icons/md";
 
 interface IQuizOtpion {
   option: string;
@@ -50,6 +51,8 @@ const QuizManagementPage = () => {
   const [limit] = useState<number>(10);
   const [selectedQuiz, setSelectedQuiz] = useState<IQuiz | null>(null);
   const [loadingQuizzes, setLoadingQuizzes] = useState<boolean>(false);
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [quizToDelete, setQuizToDelete] = useState<string | null>(null);
 
   const router = useRouter();
 
@@ -93,10 +96,42 @@ const QuizManagementPage = () => {
 
   const handleCloseModal = () => {
     setSelectedQuiz(null);
+    setShowModal(false);
+    setQuizToDelete(null);
   };
 
   const handleEdit = (quizId: string) => {
     router.push(`/admin/quizManagement/${quizId}`);
+  };
+
+  const handleDeleteQuiz = async (quizId: string) => {
+    setQuizToDelete(quizId);
+    setShowModal(true);
+  };
+  
+  const handleConfirmDelete = async () => {
+    if (!quizToDelete) return;
+    
+    try {
+      const token = localStorage.getItem('adminAccessToken')
+      const response = await deleteQuizById(token as string,quizToDelete)
+      
+      if (response.status === 200) {
+        toast.success("Quiz deleted successfully");
+        setQuizzes(prevQuizzes => prevQuizzes.filter(quiz => quiz._id !== quizToDelete));
+      }
+    } catch (error) {
+      if (axios.isAxiosError(error) && error.response?.status === 401) {
+        toast.error("Token expired...Login again!");
+        adminLogout();
+      } else {
+        toast.error("Failed to delete quiz");
+        console.error("Error deleting quiz:", error);
+      }
+    } finally {
+      setShowModal(false);
+      setQuizToDelete(null);
+    }
   };
 
   if (loadingQuizzes) {
@@ -172,6 +207,11 @@ const QuizManagementPage = () => {
                           className=" text-blue-800 cursor-pointer"
                           onClick={() => handleEdit(quiz._id)}
                         />
+
+                        <MdDelete
+                          className=" text-red-800 cursor-pointer"
+                          onClick={() => handleDeleteQuiz(quiz._id)}
+                        />
                       </td>
                     </tr>
                   ))}
@@ -240,6 +280,31 @@ const QuizManagementPage = () => {
                   ))}
                 </div>
               )}
+            </Modal>
+          )}
+
+          {showModal && quizToDelete && (
+            <Modal
+              onClose={handleCloseModal}
+              title="Delete Quiz"
+            >
+              <div className="p-4">
+                <p className="mb-4 text-white">Are you sure you want to delete this quiz?</p>
+                <div className="flex justify-between">
+                  <button
+                    onClick={handleConfirmDelete}
+                    className="bg-blue-600 p-2 rounded-xl text-white"
+                  >
+                    Yes, Delete
+                  </button>
+                  <button
+                    onClick={handleCloseModal}
+                    className="bg-red-600 p-2 rounded-xl text-white"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
             </Modal>
           )}
         </div>

@@ -77,3 +77,12 @@ export const editQuizById = async (token: string, quizId: string, name: string, 
   })
   return response
 }
+
+export const deleteQuizById = async (token: string, quizId: string,) => {
+  const response = await axios.delete(`${BACKEND_URL}/quiz/${quizId}`, {
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+  return response
+}

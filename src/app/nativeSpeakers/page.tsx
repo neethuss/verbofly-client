@@ -182,6 +182,10 @@ const Page = () => {
 
   const handleClick = async (buttonText: string, userId: string) => {
     const token = localStorage.getItem("userAccessToken");
+      if (buttonText === "Message") {
+      router.push(`/connect/${userId}`);
+      return;
+    }
 
     switch (buttonText) {
       case "Accept":
@@ -324,7 +328,7 @@ const Page = () => {
                       width={500}
                       height={500}
                       onError={(e) => {
-                        e.currentTarget.onerror = null; // Prevent infinite loop
+                        e.currentTarget.onerror = null; 
                         e.currentTarget.src = BlankProfile.src;
                       }}
                       unoptimized={true}

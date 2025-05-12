@@ -42,12 +42,31 @@ const AddQuizPage = () => {
   const [questions, setQuestions] = useState<IQuizQuestion[]>([]);
   const [selectedLanguage, setSelectedLanguage] = useState<string | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [newQuestion, setNewQuestion] = useState({
+  const [formErrors, setFormErrors] = useState({
+    name: "",
+    language: "",
+    category: "",
+    questions: ""
+  });
+  const [newQuestion, setNewQuestion] = useState<{
+    question: string;
+    options: { option: string; isCorrect: boolean }[];
+    correctAnswer: string;
+  }>({
     question: "",
-    options: [{ option: "" }, { option: "" }, { option: "" }, { option: "" }],
+    options: [
+      { option: "", isCorrect: false }, 
+      { option: "", isCorrect: false }, 
+      { option: "", isCorrect: false }, 
+      { option: "", isCorrect: false }
+    ],
     correctAnswer: "",
   });
   const router = useRouter();
+
+  // Constants for validation
+  const MIN_QUESTIONS = 5;
+  const MAX_QUESTIONS = 15;
 
   useEffect(() => {
     const fetchLanguagesData = async () => {
@@ -64,12 +83,24 @@ const AddQuizPage = () => {
     fetchCategoriesData();
   }, [token]);
 
-  const handleOpenModal = () => setShowModal(true);
+  const handleOpenModal = () => {
+    if (questions.length >= MAX_QUESTIONS) {
+      toast.warning(`You can add a maximum of ${MAX_QUESTIONS} questions per quiz`);
+      return;
+    }
+    setShowModal(true);
+  };
+
   const handleCloseModal = () => {
     setShowModal(false);
     setNewQuestion({
       question: "",
-      options: [{ option: "" }, { option: "" }, { option: "" }, { option: "" }],
+      options: [
+        { option: "", isCorrect: false }, 
+        { option: "", isCorrect: false }, 
+        { option: "", isCorrect: false }, 
+        { option: "", isCorrect: false }
+      ],
       correctAnswer: "",
     });
   };
@@ -83,39 +114,111 @@ const AddQuizPage = () => {
     index: number
   ) => {
     const newOptions = [...newQuestion.options];
-    newOptions[index] = { option: e.target.value };
+    newOptions[index] = { option: e.target.value, isCorrect: newOptions[index].isCorrect };
     setNewQuestion({ ...newQuestion, options: newOptions });
   };
 
   const handleCorrectAnswerChange = (
-    e: React.ChangeEvent<HTMLInputElement>
+    e: React.ChangeEvent<HTMLInputElement>,
+    index: number
   ) => {
-    setNewQuestion({ ...newQuestion, correctAnswer: e.target.value });
+    const optionValue = e.target.value;
+    // Update all options' isCorrect status
+    const updatedOptions = newQuestion.options.map((opt, idx) => ({
+      ...opt,
+      isCorrect: idx === index
+    }));
+    
+    setNewQuestion({
+      ...newQuestion,
+      options: updatedOptions,
+      correctAnswer: optionValue
+    });
+  };
+
+  const validateQuestion = () => {
+    // Check if question is empty
+    if (newQuestion.question.trim() === "") {
+      return { valid: false, message: "Question cannot be empty" };
+    }
+    
+    // Check if any option is empty
+    if (!newQuestion.options.every(opt => opt.option.trim() !== "")) {
+      return { valid: false, message: "All options must be filled" };
+    }
+    
+    // Check if correct answer is selected
+    if (newQuestion.correctAnswer.trim() === "") {
+      return { valid: false, message: "Please select a correct answer" };
+    }
+    
+    return { valid: true, message: "" };
   };
 
   const isQuestionValid = () => {
-    return (
-      newQuestion.question.trim() !== "" &&
-      newQuestion.options.every((opt) => opt.option.trim() !== "") &&
-      newQuestion.correctAnswer.trim() !== ""
-    );
+    const { valid } = validateQuestion();
+    return valid;
   };
 
   const handleSubmit = () => {
-    if (isQuestionValid()) {
-      setQuestions([...(questions as any), newQuestion]);
+    const validation = validateQuestion();
+    
+    if (validation.valid) {
+      const questionToAdd: IQuizQuestion = {
+        question: newQuestion.question,
+        options: newQuestion.options,
+        correctAnswer: newQuestion.correctAnswer
+      };
+      
+      setQuestions([...questions, questionToAdd]);
       handleCloseModal();
+
+      setFormErrors({...formErrors, questions: ""});
+    } else {
+      toast.error(validation.message);
     }
   };
 
   const handleDelete = (index: number) => {
     const updatedQuestions = questions.filter((_, i) => i !== index);
     setQuestions(updatedQuestions);
+    
+    if (updatedQuestions.length < MIN_QUESTIONS) {
+      setFormErrors({
+        ...formErrors, 
+        questions: `Minimum ${MIN_QUESTIONS} questions required`
+      });
+    }
   };
+
 
   const handleAddQuiz = async () => {
     try {
-      console.log("handleAddQuiz");
+      if (!name.trim()) {
+        toast.error("Please enter a quiz name");
+        return;
+      }
+      
+      if (!selectedLanguage) {
+        toast.error("Please select a language");
+        return;
+      }
+      
+      if (!selectedCategory) {
+        toast.error("Please select a category");
+        return;
+      }
+      
+      if (questions.length < MIN_QUESTIONS) {
+        toast.error(`Please add at least ${MIN_QUESTIONS} questions to create a quiz`);
+        return;
+      }
+      
+      if (questions.length > MAX_QUESTIONS) {
+        toast.error(`A quiz can have a maximum of ${MAX_QUESTIONS} questions`);
+        return;
+      }
+      
       const response = await addQuiz(
         token as string,
         name,
@@ -123,16 +226,17 @@ const AddQuizPage = () => {
         selectedCategory as string,
         questions
       );
+      
       if (response.status === 201) {
-        toast("Quiz created successfully");
+        toast.success("Quiz created successfully");
         router.push("/admin/quizManagement");
       } else if(response.status === 200){
-        console.log("already");
-        toast(
-          `Quiz already existing in the selected category in selected language`
-        );
+        toast.warning(`Quiz already exists in the selected category and language`);
       }
-    } catch (error) {}
+    } catch (error) {
+      toast.error("Failed to create quiz. Please try again.");
+      console.error("Error creating quiz:", error);
+    }
   };
 
   return (
@@ -148,43 +252,64 @@ const AddQuizPage = () => {
         <div className="flex-grow flex justify-center items-start">
           <div className="bg-transparent border border-gray-500 p-6 rounded-lg shadow-md w-full max-w-md">
             <div className="mb-4">
+              <label htmlFor="quizName" className="block mb-2 font-semibold text-white">
+                Quiz Name
+              </label>
               <input
+                id="quizName"
                 type="text"
                 placeholder="Enter quiz name"
-                onChange={(e) => setName(e.target.value)}
-                className="w-full p-2 border rounded-md bg-transparent border-gray-300"
+                value={name}
+                onChange={(e) => {
+                  setName(e.target.value);
+                  setFormErrors({...formErrors, name: ""});
+                }}
+                className={`w-full p-2 border rounded-md bg-transparent ${formErrors.name ? 'border-red-500' : 'border-gray-300'} text-white`}
               />
+              {formErrors.name && <p className="text-red-500 text-sm mt-1">{formErrors.name}</p>}
             </div>
-            <div className="mb-6 text-black ">
-              <label htmlFor="language" className="block mb-2 font-semibold">
+            
+            <div className="mb-6 text-black">
+              <label htmlFor="language" className="block mb-2 font-semibold text-white">
                 Language
               </label>
               <Select
+                id="language"
                 options={languages.map((language) => ({
                   value: language._id,
                   label: language.languageName.charAt(0).toUpperCase() + language.languageName.slice(1),
                 }))}
-                onChange={(selected) =>
-                  setSelectedLanguage(selected?.value || null)
-                }
-                className="w-full"
+                onChange={(selected) => {
+                  setSelectedLanguage(selected?.value || null);
+                  setFormErrors({...formErrors, language: ""});
+                }}
+                className={`w-full ${formErrors.language ? 'border-red-500 rounded-md border' : ''}`}
               />
+              {formErrors.language && <p className="text-red-500 text-sm mt-1">{formErrors.language}</p>}
             </div>
 
             <div className="mb-6 text-black">
-              <label htmlFor="categories" className="block mb-2 font-semibold">
+              <label htmlFor="categories" className="block mb-2 font-semibold text-white">
                 Category
               </label>
               <Select
+                id="categories"
                 options={categories.map((category) => ({
                   value: category._id,
                   label: category.categoryName.charAt(0).toUpperCase() + category.categoryName.slice(1),
                 }))}
-                onChange={(selected) =>
-                  setSelectedCategory(selected?.value || null)
-                }
-                className="w-full"
+                onChange={(selected) => {
+                  setSelectedCategory(selected?.value || null);
+                  setFormErrors({...formErrors, category: ""});
+                }}
+                className={`w-full ${formErrors.category ? 'border-red-500 rounded-md border' : ''}`}
               />
+              {formErrors.category && <p className="text-red-500 text-sm mt-1">{formErrors.category}</p>}
+            </div>
+
+            <div className="mb-4">
+              <p className="text-white mb-2">Questions Added: {questions.length}</p>
+              {formErrors.questions && <p className="text-red-500 text-sm mt-1">{formErrors.questions}</p>}
             </div>
 
             <div className="flex space-x-4">
@@ -198,11 +323,6 @@ const AddQuizPage = () => {
               <button
                 onClick={handleAddQuiz}
                 className="bg-green-500 text-white px-6 py-2 rounded-md hover:bg-green-600 transition-colors flex-grow"
-                disabled={
-                  questions.length === 0 ||
-                  !selectedLanguage ||
-                  !selectedCategory
-                }
               >
                 Add Quiz
               </button>
@@ -264,8 +384,8 @@ const AddQuizPage = () => {
                     type="radio"
                     name="correctAnswer"
                     value={opt.option}
-                    checked={newQuestion.correctAnswer === opt.option}
-                    onChange={handleCorrectAnswerChange}
+                    checked={opt.isCorrect}
+                    onChange={(e) => handleCorrectAnswerChange(e, index)}
                     className="h-4 w-4 bg-transparent border-gray-700"
                   />
                 </div>
@@ -284,7 +404,6 @@ const AddQuizPage = () => {
                 type="button"
                 onClick={handleSubmit}
                 className="bg-yellow-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors"
-                disabled={!isQuestionValid()}
               >
                 Add Question
               </button>

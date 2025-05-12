@@ -144,7 +144,7 @@ function Subscription() {
               });
             }
           } else {
-            alert(res.message);
+            toast.error(res.message)
           }
         },
         prefill: {
@@ -157,7 +157,7 @@ function Subscription() {
       };
       const paymentObject = new window.Razorpay(options);
       paymentObject.on("payment.failed", function (response: any) {
-        alert(response.error.description);
+        toast.error(response.error.description);
       });
       paymentObject.open();
     } catch (error) {

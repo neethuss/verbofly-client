@@ -30,35 +30,34 @@ interface Lesson {
   content: string;
   languageName: Language;
   categoryName: Category;
-  isBlocked:boolean
+  isBlocked: boolean;
 }
 
 const LessonListPage = () => {
-  const {logout} = useAuthStore()
-  const [currentUser, setCurrentUser] = useState<User>()
+  const { logout } = useAuthStore();
+  const [currentUser, setCurrentUser] = useState<User>();
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [isCompleted, setIsCompleted] = useState<Record<string, boolean>>({});
   const [categoryName, setCategoryName] = useState<string>("");
   const { languageId, categoryId } = useParams();
   const router = useRouter();
-  const [loadingLessons, setLoadingLessons] = useState<boolean>(false)
+  const [loadingLessons, setLoadingLessons] = useState<boolean>(false);
 
   useEffect(() => {
     const token = localStorage.getItem("userAccessToken");
     const fetchCurrentUser = async () => {
       try {
         const data = await fetchUser(token as string);
-        setCurrentUser(data)
-        
+        setCurrentUser(data);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              logout()
-            }else if (error.response.status === 401) {
+              logout();
+            } else if (error.response.status === 401) {
               toast.error("Token expired");
-              logout()
+              logout();
             }
           } else {
             toast.error("An unexpected error occurred in login");
@@ -71,31 +70,33 @@ const LessonListPage = () => {
     fetchCurrentUser();
   }, [logout]);
 
-
   useEffect(() => {
     const fetchData = async () => {
       const token = localStorage.getItem("userAccessToken");
       try {
-        setLoadingLessons(true)
+        setLoadingLessons(true);
         const data = await fetchLessonsInCategoryInLanguage(
           token as string,
           languageId as string,
           categoryId as string
         );
-        const lessons = data.filter((lesson:Lesson)=>!lesson.isBlocked)
+        const lessons = data.filter((lesson: Lesson) => !lesson.isBlocked);
         setLessons(lessons);
         if (data.length > 0) {
           setCategoryName(data[0].categoryName.categoryName);
         }
-      } catch (error) {
+      } catch (error: any) {
+        if (error.response?.status === 403) {
+          toast.error("Subscription required to access this quiz.");
+          router.push("/subscription");
+        }
         if (axios.isAxiosError(error)) {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              logout()
-            }else if (error.response.status === 401) {
+            } else if (error.response.status === 401) {
               toast.error("Token expired");
-              logout()
+              logout();
             }
           } else {
             toast.error("An unexpected error occurred in login");
@@ -103,8 +104,8 @@ const LessonListPage = () => {
         } else {
           toast.error("An error occurred during login. Please try again.");
         }
-      }finally{
-        setLoadingLessons(false)
+      } finally {
+        setLoadingLessons(false);
       }
     };
 
@@ -116,9 +117,14 @@ const LessonListPage = () => {
         const progressMap: Record<string, boolean> = {};
         const languages = response.data.languages || [];
         languages.forEach(
-          (lang: { lessons: { lesson: { _id: string } | null; isCompleted: boolean }[] }) => {
+          (lang: {
+            lessons: { lesson: { _id: string } | null; isCompleted: boolean }[];
+          }) => {
             lang.lessons.forEach(
-              (lesson: { lesson: { _id: string } | null; isCompleted: boolean }) => {
+              (lesson: {
+                lesson: { _id: string } | null;
+                isCompleted: boolean;
+              }) => {
                 if (lesson.lesson && lesson.lesson._id) {
                   progressMap[lesson.lesson._id] = lesson.isCompleted;
                 }
@@ -132,10 +138,10 @@ const LessonListPage = () => {
           if (error.response) {
             if (error.response.status === 403) {
               toast.error("User is blocked");
-              logout()
-            }else if (error.response.status === 401) {
+              logout();
+            } else if (error.response.status === 401) {
               toast.error("Token expired");
-              logout()
+              logout();
             }
           } else {
             toast.error("An unexpected error occurred in login");
@@ -150,13 +156,12 @@ const LessonListPage = () => {
     fetchUserProgressData();
   }, [languageId, categoryId, router, logout]);
 
-
   const openVideoLesson = (lessonId: string) => {
     router.push(`/lesson/${languageId}/categories/${categoryId}/${lessonId}`);
   };
 
-  if(loadingLessons){
-    return <LoadingPage/>
+  if (loadingLessons) {
+    return <LoadingPage />;
   }
 
   return (
@@ -185,7 +190,8 @@ const LessonListPage = () => {
                 <div className="flex items-center mb-3 sm:mb-4">
                   <FaBookOpen className="text-yellow-400 text-xl sm:text-2xl mr-2" />
                   <h3 className="text-lg sm:text-xl font-semibold">
-                    {lesson.title.charAt(0).toUpperCase() + lesson.title.slice(1)}
+                    {lesson.title.charAt(0).toUpperCase() +
+                      lesson.title.slice(1)}
                   </h3>
                 </div>
                 <p className="text-gray-300 mb-4 flex-grow text-sm sm:text-base">

@@ -68,15 +68,28 @@ const QuizPage = () => {
     const token = localStorage.getItem("userAccessToken");
 
     const fetchQuizData = async () => {
-      const data = await fetchQuizByLanguageAndCategory(
-        token as string,
-        languageId as string,
-        categoryId as string
-      );
-      setQuestions(data.questions);
+      try {
+        const data = await fetchQuizByLanguageAndCategory(
+          token as string,
+          languageId as string,
+          categoryId as string
+        );
+        setQuestions(data.questions);
+      } catch (error: any) {
+        if (error.response?.status === 403) {
+          toast.error("Subscription required to access this quiz.");
+          router.push("/subscription"); 
+        } else {
+          toast.error("Failed to fetch quiz data.");
+          console.error("Quiz fetch error:", error);
+        }
+      }
     };
-    fetchQuizData();
-  }, [languageId, categoryId]);
+
+    if (languageId && categoryId && token) {
+      fetchQuizData();
+    }
+  }, [languageId, categoryId, router]);
 
   const handleNext = useCallback(async () => {
     if (questions[currentQuestionIndex].correctAnswer === selectedOption) {

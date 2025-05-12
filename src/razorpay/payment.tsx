@@ -4,7 +4,7 @@ import Script from "next/script";
 import { ImProfile } from "react-icons/im";
 import useAuthStore from "@/store/authStore";
 import axios from "axios";
-import { ToastContainer ,toast} from "react-toastify";
+import { ToastContainer, toast } from "react-toastify";
 const BASE_URL = process.env.NEXT_PUBLIC_SERVER_URL;
 
 declare global {
@@ -18,7 +18,7 @@ function Payment() {
   const [currency, setCurrency] = useState("INR");
   const [loading, setLoading] = useState(false);
 
-  const {user} = useAuthStore()
+  const { user } = useAuthStore();
   // const { setPayment } = useStore();
 
   const createOrderId = async () => {
@@ -69,14 +69,16 @@ function Payment() {
           });
           const res = await result.json();
           if (res.isOk) {
-            const data = axios.post(`${BASE_URL}/api/payment`,{ email :user?.email},)
+            const data = axios.post(`${BASE_URL}/api/payment`, {
+              email: user?.email,
+            });
             toast.success("payment succeed", {
               position: "top-center",
             });
             // setPayment(false)
             console.log("sdsdsd");
           } else {
-            alert(res.message);
+            toast.error(res.message);
           }
         },
         prefill: {
@@ -89,7 +91,9 @@ function Payment() {
       };
       const paymentObject = new window.Razorpay(options);
       paymentObject.on("payment.failed", function (response: any) {
-        alert(response.error.description);
+        toast.error(response.error.description || "Payment failed", {
+          position: "top-center",
+        });
       });
       paymentObject.open();
     } catch (error) {
@@ -115,6 +119,7 @@ function Payment() {
           </button>
         </form>
       </section>
+       <ToastContainer theme="dark" />
     </>
   );
 }
