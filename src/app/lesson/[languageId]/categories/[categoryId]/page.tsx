@@ -87,7 +87,7 @@ const LessonListPage = () => {
         }
       } catch (error: any) {
         if (error.response?.status === 403) {
-          toast.error("Subscription required to access this quiz.");
+          toast.error("Subscription required to access this lesson.");
           router.push("/subscription");
         }
         if (axios.isAxiosError(error)) {
