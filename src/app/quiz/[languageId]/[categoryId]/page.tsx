@@ -8,6 +8,8 @@ import useAuthStore from "@/store/authStore";
 import { User } from "@/Types/chat";
 import axios from "axios";
 import { toast } from "react-toastify";
+import ProtectedRoute from "@/HOC/ProtectedRoute";
+
 
 interface IQuizOption {
   option: string;
@@ -232,4 +234,4 @@ const QuizPage = () => {
   );
 };
 
-export default QuizPage;
+export default ProtectedRoute(QuizPage);

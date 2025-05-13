@@ -13,6 +13,7 @@ import { User } from "@/Types/chat";
 import axios from "axios";
 import { fetchUser } from "@/services/userApi";
 import { toast } from "react-toastify";
+import ProtectedRoute from "@/HOC/ProtectedRoute";
 
 interface ICategory {
   _id: string;
@@ -178,4 +179,4 @@ const QuizLanguagePage = () => {
   );
 };
 
-export default QuizLanguagePage;
+export default ProtectedRoute(QuizLanguagePage) ;
